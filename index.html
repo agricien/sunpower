@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sunpower - Análisis Histórico de Producción Solar</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/noUiSlider/15.7.1/nouislider.min.css" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/noUiSlider/15.7.1/nouislider.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         :root {
@@ -106,6 +108,34 @@
             border-color: var(--primary);
             box-shadow: 0 0 10px rgba(245, 158, 11, 0.4);
         }
+        .slicer-container {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 20px 40px 30px 40px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+            text-align: center;
+        }
+        .slicer-inputs {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-bottom: 25px;
+        }
+        .slicer-inputs input {
+            background: var(--bg);
+            color: var(--text);
+            border: 1px solid var(--border);
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-family: inherit;
+        }
+        /* Custom noUiSlider theme */
+        .noUi-connect { background: var(--primary); }
+        .noUi-handle { border: 2px solid var(--primary); background: var(--bg); border-radius: 50%; box-shadow: none; cursor: ew-resize; }
+        .noUi-handle::before, .noUi-handle::after { display: none; }
+        
         .loader {
             text-align: center;
             padding: 50px;
@@ -131,6 +161,21 @@
         <div id="loading" class="loader">Cargando datos de Open-Meteo...</div>
 
         <div id="content" style="display: none;">
+            
+            <div class="slicer-container" id="slicer-panel">
+                <div class="slicer-inputs">
+                    <div>
+                        <label style="display:block; font-size:0.8rem; color:var(--text-muted); margin-bottom:5px;">Fecha Inicio</label>
+                        <input type="date" id="date-start">
+                    </div>
+                    <div>
+                        <label style="display:block; font-size:0.8rem; color:var(--text-muted); margin-bottom:5px;">Fecha Fin</label>
+                        <input type="date" id="date-end">
+                    </div>
+                </div>
+                <div id="date-slider"></div>
+            </div>
+
             <div class="summary-grid">
                 <div class="card">
                     <div class="card-label">Producción Real Promedio</div>
@@ -173,6 +218,8 @@
         let currentMode = 'hist-mes';
         let prodChartInst = null;
         let weaChartInst = null;
+        let currentDailyData = [];
+        let dateSlider = null;
 
         // Caché de datos para no llamar la API repetidamente
         let dataCache = {
@@ -220,10 +267,6 @@
             const humids = data.daily.relative_humidity_2m_mean || Array(dates.length).fill(0);
             const ghis_mj = data.daily.shortwave_radiation_sum;
 
-            let totalReal = 0;
-            let totalGhi = 0;
-            let totalPR = 0;
-
             let dailyData = [];
 
             for (let i = 0; i < dates.length; i++) {
@@ -253,10 +296,6 @@
 
                 let real = nominal * prFinal;
 
-                totalReal += real;
-                totalGhi += ghi_kwh;
-                totalPR += prFinal;
-
                 dailyData.push({
                     date: dates[i],
                     real: real,
@@ -266,17 +305,92 @@
                     rain: rain,
                     cloud: cloud,
                     humid: humid,
+                    pr: prFinal,
                     month: dateObj.getMonth(),
                     yyyy_mm: dates[i].substring(0, 7)
                 });
             }
 
-            let numYears = Math.max(1, dates.length / 365.25);
-            let avgPR = (totalPR / dates.length) * 100;
-            let avgLoss = 75 - avgPR; 
+            currentDailyData = dailyData;
+            initSlicer(currentDailyData);
+            
+            document.getElementById("loading").style.display = "none";
+            document.getElementById("content").style.display = "block";
+        }
+        
+        function initSlicer(data) {
+            if (!data || data.length === 0) return;
+            
+            let minDate = new Date(data[0].date + 'T00:00:00').getTime();
+            let maxDate = new Date(data[data.length-1].date + 'T00:00:00').getTime();
+            
+            let elSlider = document.getElementById('date-slider');
+            
+            if (dateSlider) {
+                dateSlider.destroy();
+            }
+            
+            noUiSlider.create(elSlider, {
+                start: [minDate, maxDate],
+                connect: true,
+                step: 24 * 60 * 60 * 1000, // 1 dia
+                range: {
+                    'min': minDate,
+                    'max': maxDate
+                }
+            });
+            
+            dateSlider = elSlider.noUiSlider;
+            
+            // Handlers para el slider
+            dateSlider.on('update', function (values, handle) {
+                let d1 = new Date(parseInt(values[0]));
+                let d2 = new Date(parseInt(values[1]));
+                
+                document.getElementById('date-start').value = d1.toISOString().split('T')[0];
+                document.getElementById('date-end').value = d2.toISOString().split('T')[0];
+                
+                let startStr = document.getElementById('date-start').value;
+                let endStr = document.getElementById('date-end').value;
+                
+                let filtered = currentDailyData.filter(d => d.date >= startStr && d.date <= endStr);
+                updateDashboard(filtered, currentMode);
+            });
+            
+            // Handlers para inputs de fecha (unbind para evitar duplicados en recargas)
+            let inStart = document.getElementById('date-start');
+            let inEnd = document.getElementById('date-end');
+            
+            let updateFromInputs = function() {
+                let v1 = new Date(inStart.value + 'T00:00:00').getTime();
+                let v2 = new Date(inEnd.value + 'T00:00:00').getTime();
+                if(v1 && v2) dateSlider.set([v1, v2]);
+            };
+            
+            // Remove listeners (by replacing node if needed, but onchange is simpler if we just assign it)
+            inStart.onchange = updateFromInputs;
+            inEnd.onchange = updateFromInputs;
+        }
 
-            // Para los históricos largos mostramos promedios anuales
-            if (numYears > 1) {
+        function updateDashboard(filteredData, mode) {
+            if (!filteredData || filteredData.length === 0) return;
+            
+            let totalReal = 0;
+            let totalGhi = 0;
+            let totalPR = 0;
+            
+            filteredData.forEach(d => {
+                totalReal += d.real;
+                totalGhi += d.ghi;
+                totalPR += d.pr;
+            });
+            
+            let days = filteredData.length;
+            let numYears = Math.max(1, days / 365.25);
+            let avgPR = (totalPR / days) * 100;
+            let avgLoss = 75 - avgPR;
+            
+            if (numYears > 1 && (mode === 'hist-mes' || mode === 'hist-dia' || mode === 'fcst-ano')) {
                 totalReal = totalReal / numYears;
                 totalGhi = totalGhi / numYears;
             }
@@ -285,11 +399,8 @@
             document.getElementById("avg-pr").innerText = avgPR.toFixed(1) + "%";
             document.getElementById("total-ghi").innerText = totalGhi.toFixed(0) + " kWh/m²";
             document.getElementById("total-loss").innerText = "-" + avgLoss.toFixed(1) + "%";
-
-            document.getElementById("loading").style.display = "none";
-            document.getElementById("content").style.display = "block";
-
-            renderCharts(dailyData, mode);
+            
+            renderCharts(filteredData, mode);
         }
 
         function renderCharts(dailyData, mode) {
