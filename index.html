@@ -121,10 +121,10 @@
             <p>Análisis y Pronóstico de Producción Solar | 9.9400298, -84.0474052</p>
             
             <div class="btn-group">
-                <button class="btn active" id="btn-hist-mes" onclick="setMode('hist-mes')">📅 Histórico Mensual (2025)</button>
-                <button class="btn" id="btn-hist-dia" onclick="setMode('hist-dia')">📆 Histórico Diario (2025)</button>
+                <button class="btn active" id="btn-hist-mes" onclick="setMode('hist-mes')">📅 Histórico Mensual (2020-2025)</button>
+                <button class="btn" id="btn-hist-dia" onclick="setMode('hist-dia')">📆 Histórico Diario (2020-2025)</button>
                 <button class="btn" id="btn-fcst-16d" onclick="setMode('fcst-16d')">🔮 Pronóstico 16 Días</button>
-                <button class="btn" id="btn-fcst-ano" onclick="setMode('fcst-ano')">📊 Pronóstico Mensual (TMY)</button>
+                <button class="btn" id="btn-fcst-ano" onclick="setMode('fcst-ano')">📊 Pronóstico Anual (TMY)</button>
             </div>
         </header>
 
@@ -133,9 +133,9 @@
         <div id="content" style="display: none;">
             <div class="summary-grid">
                 <div class="card">
-                    <div class="card-label">Producción Real Total</div>
+                    <div class="card-label">Producción Real Promedio</div>
                     <div class="card-value" id="total-real">0 kWh</div>
-                    <div class="card-label">Generación Estimada (1 kWp)</div>
+                    <div class="card-label">Generación Estimada Anual</div>
                 </div>
                 <div class="card">
                     <div class="card-label">Eficiencia Promedio (PR)</div>
@@ -145,7 +145,7 @@
                 <div class="card">
                     <div class="card-label">Radiación Global (GHI)</div>
                     <div class="card-value" id="total-ghi">0 kWh/m²</div>
-                    <div class="card-label">Radiación Recibida</div>
+                    <div class="card-label">Radiación Anual Promedio</div>
                 </div>
                 <div class="card">
                     <div class="card-label">Pérdida por Variables</div>
@@ -193,7 +193,7 @@
             try {
                 if (mode === 'hist-mes' || mode === 'hist-dia' || mode === 'fcst-ano') {
                     if (!dataCache['hist']) {
-                        const url = `https://archive-api.open-meteo.com/v1/archive?latitude=${LAT}&longitude=${LON}&start_date=2025-01-01&end_date=2025-12-31&timezone=America/Costa_Rica&daily=temperature_2m_max,precipitation_sum,shortwave_radiation_sum,cloudcover_mean,relative_humidity_2m_mean`;
+                        const url = `https://archive-api.open-meteo.com/v1/archive?latitude=${LAT}&longitude=${LON}&start_date=2020-01-01&end_date=2025-12-31&timezone=America/Costa_Rica&daily=temperature_2m_max,precipitation_sum,shortwave_radiation_sum,cloudcover_mean,relative_humidity_2m_mean`;
                         const res = await fetch(url);
                         dataCache['hist'] = await res.json();
                     }
@@ -266,12 +266,20 @@
                     rain: rain,
                     cloud: cloud,
                     humid: humid,
-                    month: dateObj.getMonth()
+                    month: dateObj.getMonth(),
+                    yyyy_mm: dates[i].substring(0, 7)
                 });
             }
 
+            let numYears = Math.max(1, dates.length / 365.25);
             let avgPR = (totalPR / dates.length) * 100;
             let avgLoss = 75 - avgPR; 
+
+            // Para los históricos largos mostramos promedios anuales
+            if (numYears > 1) {
+                totalReal = totalReal / numYears;
+                totalGhi = totalGhi / numYears;
+            }
 
             document.getElementById("total-real").innerText = totalReal.toFixed(0) + " kWh";
             document.getElementById("avg-pr").innerText = avgPR.toFixed(1) + "%";
@@ -293,9 +301,10 @@
             let cloudPlot = [];
             
             const monthNames = ["Ene", "Feb", "Mar", "Abr", "May", "Jun", "Jul", "Ago", "Sep", "Oct", "Nov", "Dic"];
+            let numYears = Math.max(1, dailyData.length / 365.25);
 
-            if (mode === 'hist-mes' || mode === 'fcst-ano') {
-                // Agrupar por mes
+            if (mode === 'fcst-ano') {
+                // TMY: Agrupar por mes y promediar los años
                 let monthly = Array(12).fill(0).map(() => ({
                     real: 0, nominal: 0, temp: 0, humid: 0, cloud: 0, days: 0
                 }));
@@ -309,11 +318,32 @@
                 });
                 
                 labels = monthNames;
-                realPlot = monthly.map(m => m.real);
-                nominalPlot = monthly.map(m => m.nominal);
+                realPlot = monthly.map(m => m.real / numYears);
+                nominalPlot = monthly.map(m => m.nominal / numYears);
                 tempPlot = monthly.map(m => m.days > 0 ? m.temp / m.days : 0);
                 humidPlot = monthly.map(m => m.days > 0 ? m.humid / m.days : 0);
                 cloudPlot = monthly.map(m => m.days > 0 ? m.cloud / m.days : 0);
+            } else if (mode === 'hist-mes') {
+                // Histórico mensual completo: Agrupar por YYYY-MM
+                let monthlyMap = {};
+                dailyData.forEach(d => {
+                    if (!monthlyMap[d.yyyy_mm]) {
+                        monthlyMap[d.yyyy_mm] = { real: 0, nominal: 0, temp: 0, humid: 0, cloud: 0, days: 0 };
+                    }
+                    monthlyMap[d.yyyy_mm].real += d.real;
+                    monthlyMap[d.yyyy_mm].nominal += d.nominal;
+                    monthlyMap[d.yyyy_mm].temp += d.temp;
+                    monthlyMap[d.yyyy_mm].humid += d.humid;
+                    monthlyMap[d.yyyy_mm].cloud += d.cloud;
+                    monthlyMap[d.yyyy_mm].days += 1;
+                });
+                
+                labels = Object.keys(monthlyMap);
+                realPlot = labels.map(k => monthlyMap[k].real);
+                nominalPlot = labels.map(k => monthlyMap[k].nominal);
+                tempPlot = labels.map(k => monthlyMap[k].days > 0 ? monthlyMap[k].temp / monthlyMap[k].days : 0);
+                humidPlot = labels.map(k => monthlyMap[k].days > 0 ? monthlyMap[k].humid / monthlyMap[k].days : 0);
+                cloudPlot = labels.map(k => monthlyMap[k].days > 0 ? monthlyMap[k].cloud / monthlyMap[k].days : 0);
             } else {
                 // Diario o 16 días
                 labels = dailyData.map(d => d.date);
