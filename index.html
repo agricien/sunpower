@@ -198,8 +198,8 @@
             <hr style="border-color: var(--border); margin: 25px 0;">
             
             <div class="btn-group">
-                <button class="btn active" id="btn-hist-mes" onclick="setMode('hist-mes')">📅 Histórico Mensual (2020-2025)</button>
-                <button class="btn" id="btn-hist-dia" onclick="setMode('hist-dia')">📆 Histórico Diario (2020-2025)</button>
+                <button class="btn active" id="btn-hist-mes" onclick="setMode('hist-mes')">📅 Histórico Mensual (2020-2026)</button>
+                <button class="btn" id="btn-hist-dia" onclick="setMode('hist-dia')">📆 Histórico Diario (2020-2026)</button>
                 <button class="btn" id="btn-fcst-16d" onclick="setMode('fcst-16d')">🔮 Próximos 16 días</button>
                 <button class="btn" id="btn-fcst-ano" onclick="setMode('fcst-ano')">📊 Pronóstico Anual (TMY)</button>
             </div>
@@ -243,6 +243,11 @@
                     <div class="card-label">Radiación Global (GHI)</div>
                     <div class="card-value" id="total-ghi">0 kWh/m²</div>
                     <div class="card-label">Radiación Anual Promedio</div>
+                </div>
+                <div class="card">
+                    <div class="card-label">Horas Sol Promedio</div>
+                    <div class="card-value" id="avg-sun" style="color: #fbbf24;">0 h</div>
+                    <div class="card-label">Insolación Diaria</div>
                 </div>
                 <div class="card">
                     <div class="card-label">Pérdida por Variables</div>
@@ -365,6 +370,39 @@
             }
         }
 
+        async function getHistoricalData() {
+            try {
+                // Cargar archivo estático local 2020-2025
+                let resLocal = await fetch('historico_2020_2025.json');
+                let dataLocal = await resLocal.json();
+                
+                // Buscar desde el 1 de enero de 2026 hasta ayer
+                let d = new Date();
+                d.setDate(d.getDate() - 1);
+                let endDate = d.toISOString().split('T')[0];
+                
+                let url2026 = `https://archive-api.open-meteo.com/v1/archive?latitude=${LAT}&longitude=${LON}&start_date=2026-01-01&end_date=${endDate}&timezone=America/Costa_Rica&daily=temperature_2m_max,precipitation_sum,shortwave_radiation_sum,cloudcover_mean,relative_humidity_2m_mean,sunshine_duration`;
+                
+                try {
+                    let res2026 = await fetch(url2026);
+                    if (res2026.ok) {
+                        let data2026 = await res2026.json();
+                        // Unir los arreglos
+                        for (let key in dataLocal.daily) {
+                            if (data2026.daily[key]) {
+                                dataLocal.daily[key] = dataLocal.daily[key].concat(data2026.daily[key]);
+                            }
+                        }
+                    }
+                } catch(e) { console.log('Datos 2026 no disponibles aún', e); }
+                
+                return dataLocal;
+            } catch (err) {
+                console.error("Error al cargar historico_2020_2025.json", err);
+                throw err;
+            }
+        }
+
         async function setMode(mode) {
             currentMode = mode;
             
@@ -378,14 +416,12 @@
             try {
                 if (mode === 'hist-mes' || mode === 'hist-dia' || mode === 'fcst-ano') {
                     if (!dataCache['hist']) {
-                        const url = `https://archive-api.open-meteo.com/v1/archive?latitude=${LAT}&longitude=${LON}&start_date=2020-01-01&end_date=2025-12-31&timezone=America/Costa_Rica&daily=temperature_2m_max,precipitation_sum,shortwave_radiation_sum,cloudcover_mean,relative_humidity_2m_mean`;
-                        const res = await fetch(url);
-                        dataCache['hist'] = await res.json();
+                        dataCache['hist'] = await getHistoricalData();
                     }
                     processData(dataCache['hist'], mode);
                 } else if (mode === 'fcst-16d') {
                     if (!dataCache['fcst16']) {
-                        const url = `https://api.open-meteo.com/v1/forecast?latitude=${LAT}&longitude=${LON}&timezone=America/Costa_Rica&daily=temperature_2m_max,precipitation_sum,shortwave_radiation_sum,cloudcover_mean,relative_humidity_2m_mean&forecast_days=16`;
+                        const url = `https://api.open-meteo.com/v1/forecast?latitude=${LAT}&longitude=${LON}&timezone=America/Costa_Rica&daily=temperature_2m_max,precipitation_sum,shortwave_radiation_sum,cloudcover_mean,relative_humidity_2m_mean,sunshine_duration&forecast_days=16`;
                         const res = await fetch(url);
                         dataCache['fcst16'] = await res.json();
                     }
@@ -393,7 +429,7 @@
                 }
             } catch (err) {
                 console.error(err);
-                document.getElementById("loading").innerText = "Error al cargar los datos de Open-Meteo.";
+                document.getElementById("loading").innerText = "Error al cargar los datos.";
             }
         }
 
@@ -404,6 +440,7 @@
             const clouds = data.daily.cloudcover_mean;
             const humids = data.daily.relative_humidity_2m_mean || Array(dates.length).fill(0);
             const ghis_mj = data.daily.shortwave_radiation_sum;
+            const sunshines = data.daily.sunshine_duration || Array(dates.length).fill(0);
 
             let dailyData = [];
 
@@ -419,6 +456,7 @@
                 let cloud = clouds[i] || 0;
                 let rain = rains[i] || 0;
                 let humid = humids[i] || 0;
+                let sun_hrs = (sunshines[i] || 0) / 3600;
 
                 // Fórmulas
                 let factorOrbital = 1 + 0.033 * Math.cos(2 * Math.PI * julianDay / 365);
@@ -443,6 +481,7 @@
                     rain: rain,
                     cloud: cloud,
                     humid: humid,
+                    sun: sun_hrs,
                     pr: prFinal,
                     month: dateObj.getMonth(),
                     yyyy_mm: dates[i].substring(0, 7)
@@ -516,17 +555,20 @@
             let totalReal = 0;
             let totalGhi = 0;
             let totalPR = 0;
+            let totalSun = 0;
             
             filteredData.forEach(d => {
                 totalReal += d.real;
                 totalGhi += d.ghi;
                 totalPR += d.pr;
+                totalSun += d.sun;
             });
             
             let days = filteredData.length;
             let numYears = Math.max(1, days / 365.25);
             let avgPR = (totalPR / days) * 100;
             let avgLoss = 75 - avgPR;
+            let avgSun = totalSun / days;
             
             if (numYears > 1 && (mode === 'hist-mes' || mode === 'hist-dia' || mode === 'fcst-ano')) {
                 totalReal = totalReal / numYears;
@@ -536,6 +578,7 @@
             document.getElementById("total-real").innerText = totalReal.toFixed(0) + " kWh";
             document.getElementById("avg-pr").innerText = avgPR.toFixed(1) + "%";
             document.getElementById("total-ghi").innerText = totalGhi.toFixed(0) + " kWh/m²";
+            document.getElementById("avg-sun").innerText = avgSun.toFixed(1) + " h";
             document.getElementById("total-loss").innerText = "-" + avgLoss.toFixed(1) + "%";
             
             renderCharts(filteredData, mode);
