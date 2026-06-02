@@ -168,15 +168,27 @@
         .tab-btn.active { background: var(--primary); color: #fff; border-color: var(--primary); }
         .tab-pane { display: none; line-height: 1.6; color: var(--text-muted); }
         .tab-pane.active { display: block; color: var(--text); }
+
+        /* Media Queries para Responsividad (Móviles) */
+        @media (max-width: 600px) {
+            body { padding: 10px; }
+            h1 { font-size: 1.5rem; }
+            .logos-container { flex-direction: column; gap: 15px; }
+            .tec-logo, .uned-logo { height: 35px !important; }
+            .slicer-inputs { flex-direction: column; align-items: center; gap: 10px; }
+            .slicer-inputs div { width: 100%; text-align: center; }
+            .btn-group { flex-direction: column; align-items: stretch; }
+            .btn { width: 100%; margin-bottom: 5px; }
+        }
     </style>
 </head>
 <body>
     <div class="container">
         <header style="margin-bottom: 40px;">
             <!-- Logos -->
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; padding: 10px 20px; background: #fff; border-radius: 8px;">
-                <img src="https://www.tec.ac.cr/themes/custom/tecnologico/logo.svg" alt="TEC Logo" style="height: 45px; background: #0f172a; padding: 5px 15px; border-radius: 4px;">
-                <img src="https://uned.ac.cr/themes/custom/uned/img/uned_logo_header_2025.svg" alt="UNED Logo" style="height: 45px;">
+            <div class="logos-container" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; padding: 10px 20px; background: #fff; border-radius: 8px;">
+                <img src="https://www.tec.ac.cr/themes/custom/tecnologico/logo.svg" alt="TEC Logo" class="tec-logo" style="height: 45px; background: #0f172a; padding: 5px 15px; border-radius: 4px;">
+                <img src="https://uned.ac.cr/themes/custom/uned/img/uned_logo_header_2025.svg" alt="UNED Logo" class="uned-logo" style="height: 45px;">
             </div>
             
             <!-- Encabezado Académico -->
