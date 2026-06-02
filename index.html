@@ -78,6 +78,34 @@
             box-shadow: 0 4px 6px rgba(0,0,0,0.3);
             height: 400px;
         }
+        .btn-group {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        .btn {
+            background: var(--surface);
+            color: var(--text-muted);
+            border: 1px solid var(--border);
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.95rem;
+            font-weight: 600;
+            transition: all 0.2s;
+        }
+        .btn:hover {
+            border-color: var(--text);
+            color: var(--text);
+        }
+        .btn.active {
+            background: var(--primary);
+            color: #fff;
+            border-color: var(--primary);
+            box-shadow: 0 0 10px rgba(245, 158, 11, 0.4);
+        }
         .loader {
             text-align: center;
             padding: 50px;
@@ -90,10 +118,17 @@
     <div class="container">
         <header>
             <h1>⚡ Sunpower Solar Analytics</h1>
-            <p>Análisis de Producción Solar 2025 | 9.9400298, -84.0474052</p>
+            <p>Análisis y Pronóstico de Producción Solar | 9.9400298, -84.0474052</p>
+            
+            <div class="btn-group">
+                <button class="btn active" id="btn-hist-mes" onclick="setMode('hist-mes')">📅 Histórico Mensual (2025)</button>
+                <button class="btn" id="btn-hist-dia" onclick="setMode('hist-dia')">📆 Histórico Diario (2025)</button>
+                <button class="btn" id="btn-fcst-16d" onclick="setMode('fcst-16d')">🔮 Pronóstico 16 Días</button>
+                <button class="btn" id="btn-fcst-ano" onclick="setMode('fcst-ano')">📊 Pronóstico Mensual (TMY)</button>
+            </div>
         </header>
 
-        <div id="loading" class="loader">Cargando datos históricos de Open-Meteo...</div>
+        <div id="loading" class="loader">Cargando datos de Open-Meteo...</div>
 
         <div id="content" style="display: none;">
             <div class="summary-grid">
@@ -110,7 +145,7 @@
                 <div class="card">
                     <div class="card-label">Radiación Global (GHI)</div>
                     <div class="card-value" id="total-ghi">0 kWh/m²</div>
-                    <div class="card-label">Radiación Anual Total</div>
+                    <div class="card-label">Radiación Recibida</div>
                 </div>
                 <div class="card">
                     <div class="card-label">Pérdida por Variables</div>
@@ -133,43 +168,63 @@
     <script>
         const LAT = 9.9400298;
         const LON = -84.0474052;
-        const START_DATE = "2025-01-01";
-        const END_DATE = "2025-12-31";
         const KWP = 1.0;
+        
+        let currentMode = 'hist-mes';
+        let prodChartInst = null;
+        let weaChartInst = null;
 
-        async function fetchData() {
-            const url = `https://archive-api.open-meteo.com/v1/archive?latitude=${LAT}&longitude=${LON}&start_date=${START_DATE}&end_date=${END_DATE}&timezone=America/Costa_Rica&daily=temperature_2m_max,precipitation_sum,shortwave_radiation_sum,cloudcover_mean,relative_humidity_2m_mean`;
+        // Caché de datos para no llamar la API repetidamente
+        let dataCache = {
+            'hist': null,
+            'fcst16': null
+        };
+
+        async function setMode(mode) {
+            currentMode = mode;
             
+            // Actualizar botones
+            document.querySelectorAll('.btn').forEach(b => b.classList.remove('active'));
+            document.getElementById('btn-' + mode).classList.add('active');
+            
+            document.getElementById("content").style.display = "none";
+            document.getElementById("loading").style.display = "block";
+
             try {
-                const response = await fetch(url);
-                const data = await response.json();
-                processData(data);
+                if (mode === 'hist-mes' || mode === 'hist-dia' || mode === 'fcst-ano') {
+                    if (!dataCache['hist']) {
+                        const url = `https://archive-api.open-meteo.com/v1/archive?latitude=${LAT}&longitude=${LON}&start_date=2025-01-01&end_date=2025-12-31&timezone=America/Costa_Rica&daily=temperature_2m_max,precipitation_sum,shortwave_radiation_sum,cloudcover_mean,relative_humidity_2m_mean`;
+                        const res = await fetch(url);
+                        dataCache['hist'] = await res.json();
+                    }
+                    processData(dataCache['hist'], mode);
+                } else if (mode === 'fcst-16d') {
+                    if (!dataCache['fcst16']) {
+                        const url = `https://api.open-meteo.com/v1/forecast?latitude=${LAT}&longitude=${LON}&timezone=America/Costa_Rica&daily=temperature_2m_max,precipitation_sum,shortwave_radiation_sum,cloudcover_mean,relative_humidity_2m_mean&forecast_days=16`;
+                        const res = await fetch(url);
+                        dataCache['fcst16'] = await res.json();
+                    }
+                    processData(dataCache['fcst16'], mode);
+                }
             } catch (err) {
                 console.error(err);
-                document.getElementById("loading").innerText = "Error al cargar los datos.";
+                document.getElementById("loading").innerText = "Error al cargar los datos de Open-Meteo.";
             }
         }
 
-        function processData(data) {
+        function processData(data, mode) {
             const dates = data.daily.time;
             const temps = data.daily.temperature_2m_max;
             const rains = data.daily.precipitation_sum;
             const clouds = data.daily.cloudcover_mean;
-            const humids = data.daily.relative_humidity_2m_mean;
+            const humids = data.daily.relative_humidity_2m_mean || Array(dates.length).fill(0);
             const ghis_mj = data.daily.shortwave_radiation_sum;
 
             let totalReal = 0;
             let totalGhi = 0;
             let totalPR = 0;
 
-            let dailyReal = [];
-            let dailyNominal = [];
-            let dailyPR = [];
-
-            // Mensual aggregation for smoother charts
-            let monthly = Array(12).fill(0).map(() => ({
-                real: 0, nominal: 0, ghi: 0, temp: 0, rain: 0, cloud: 0, humid: 0, days: 0
-            }));
+            let dailyData = [];
 
             for (let i = 0; i < dates.length; i++) {
                 let dateObj = new Date(dates[i] + 'T00:00:00');
@@ -184,7 +239,7 @@
                 let rain = rains[i] || 0;
                 let humid = humids[i] || 0;
 
-                // Formulas
+                // Fórmulas
                 let factorOrbital = 1 + 0.033 * Math.cos(2 * Math.PI * julianDay / 365);
                 let nominal = KWP * ghi_kwh * factorOrbital;
 
@@ -202,23 +257,21 @@
                 totalGhi += ghi_kwh;
                 totalPR += prFinal;
 
-                dailyReal.push(real);
-                dailyNominal.push(nominal);
-                dailyPR.push(prFinal * 100);
-
-                let m = dateObj.getMonth();
-                monthly[m].real += real;
-                monthly[m].nominal += nominal;
-                monthly[m].ghi += ghi_kwh;
-                monthly[m].temp += temp;
-                monthly[m].rain += rain;
-                monthly[m].cloud += cloud;
-                monthly[m].humid += humid;
-                monthly[m].days += 1;
+                dailyData.push({
+                    date: dates[i],
+                    real: real,
+                    nominal: nominal,
+                    ghi: ghi_kwh,
+                    temp: temp,
+                    rain: rain,
+                    cloud: cloud,
+                    humid: humid,
+                    month: dateObj.getMonth()
+                });
             }
 
             let avgPR = (totalPR / dates.length) * 100;
-            let avgLoss = 75 - avgPR; // Base is 75%
+            let avgLoss = 75 - avgPR; 
 
             document.getElementById("total-real").innerText = totalReal.toFixed(0) + " kWh";
             document.getElementById("avg-pr").innerText = avgPR.toFixed(1) + "%";
@@ -228,29 +281,67 @@
             document.getElementById("loading").style.display = "none";
             document.getElementById("content").style.display = "block";
 
-            renderCharts(monthly);
+            renderCharts(dailyData, mode);
         }
 
-        function renderCharts(monthly) {
-            const labels = ["Ene", "Feb", "Mar", "Abr", "May", "Jun", "Jul", "Ago", "Sep", "Oct", "Nov", "Dic"];
-            const realData = monthly.map(m => m.real);
-            const nominalData = monthly.map(m => m.nominal);
+        function renderCharts(dailyData, mode) {
+            let labels = [];
+            let realPlot = [];
+            let nominalPlot = [];
+            let tempPlot = [];
+            let humidPlot = [];
+            let cloudPlot = [];
+            
+            const monthNames = ["Ene", "Feb", "Mar", "Abr", "May", "Jun", "Jul", "Ago", "Sep", "Oct", "Nov", "Dic"];
+
+            if (mode === 'hist-mes' || mode === 'fcst-ano') {
+                // Agrupar por mes
+                let monthly = Array(12).fill(0).map(() => ({
+                    real: 0, nominal: 0, temp: 0, humid: 0, cloud: 0, days: 0
+                }));
+                dailyData.forEach(d => {
+                    monthly[d.month].real += d.real;
+                    monthly[d.month].nominal += d.nominal;
+                    monthly[d.month].temp += d.temp;
+                    monthly[d.month].humid += d.humid;
+                    monthly[d.month].cloud += d.cloud;
+                    monthly[d.month].days += 1;
+                });
+                
+                labels = monthNames;
+                realPlot = monthly.map(m => m.real);
+                nominalPlot = monthly.map(m => m.nominal);
+                tempPlot = monthly.map(m => m.days > 0 ? m.temp / m.days : 0);
+                humidPlot = monthly.map(m => m.days > 0 ? m.humid / m.days : 0);
+                cloudPlot = monthly.map(m => m.days > 0 ? m.cloud / m.days : 0);
+            } else {
+                // Diario o 16 días
+                labels = dailyData.map(d => d.date);
+                realPlot = dailyData.map(d => d.real);
+                nominalPlot = dailyData.map(d => d.nominal);
+                tempPlot = dailyData.map(d => d.temp);
+                humidPlot = dailyData.map(d => d.humid);
+                cloudPlot = dailyData.map(d => d.cloud);
+            }
+
+            if (prodChartInst) prodChartInst.destroy();
+            if (weaChartInst) weaChartInst.destroy();
 
             const ctxProd = document.getElementById('productionChart').getContext('2d');
-            new Chart(ctxProd, {
+            prodChartInst = new Chart(ctxProd, {
                 type: 'bar',
                 data: {
                     labels: labels,
                     datasets: [
                         {
                             label: 'Producción Real (kWh)',
-                            data: realData,
+                            data: realPlot,
                             backgroundColor: '#f59e0b',
                             borderRadius: 4
                         },
                         {
                             label: 'Producción Nominal (kWh)',
-                            data: nominalData,
+                            data: nominalPlot,
                             backgroundColor: 'rgba(59, 130, 246, 0.5)',
                             borderRadius: 4
                         }
@@ -259,7 +350,10 @@
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
-                    plugins: { title: { display: true, text: 'Producción Solar Mensual (2025)', color: '#f8fafc' }, legend: { labels: { color: '#cbd5e1' } } },
+                    plugins: { 
+                        title: { display: true, text: 'Producción Solar ' + (mode === 'fcst-16d' ? 'Diaria (16 Días)' : (mode === 'hist-dia' ? 'Diaria' : 'Mensual')), color: '#f8fafc' }, 
+                        legend: { labels: { color: '#cbd5e1' } } 
+                    },
                     scales: {
                         y: { ticks: { color: '#cbd5e1' }, grid: { color: '#334155' } },
                         x: { ticks: { color: '#cbd5e1' }, grid: { color: 'transparent' } }
@@ -267,31 +361,27 @@
                 }
             });
 
-            const tempData = monthly.map(m => m.temp / m.days);
-            const humidData = monthly.map(m => m.humid / m.days);
-            const cloudData = monthly.map(m => m.cloud / m.days);
-
             const ctxWea = document.getElementById('weatherChart').getContext('2d');
-            new Chart(ctxWea, {
+            weaChartInst = new Chart(ctxWea, {
                 type: 'line',
                 data: {
                     labels: labels,
                     datasets: [
                         {
-                            label: 'Temp Máx Prom (°C)',
-                            data: tempData,
+                            label: 'Temp Máx (°C)',
+                            data: tempPlot,
                             borderColor: '#ef4444',
                             tension: 0.4
                         },
                         {
-                            label: 'Humedad Prom (%)',
-                            data: humidData,
+                            label: 'Humedad (%)',
+                            data: humidPlot,
                             borderColor: '#3b82f6',
                             tension: 0.4
                         },
                         {
-                            label: 'Nubosidad Prom (%)',
-                            data: cloudData,
+                            label: 'Nubosidad (%)',
+                            data: cloudPlot,
                             borderColor: '#94a3b8',
                             borderDash: [5, 5],
                             tension: 0.4
@@ -301,7 +391,10 @@
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
-                    plugins: { title: { display: true, text: 'Variables Meteorológicas Mensuales (2025)', color: '#f8fafc' }, legend: { labels: { color: '#cbd5e1' } } },
+                    plugins: { 
+                        title: { display: true, text: 'Variables Meteorológicas', color: '#f8fafc' }, 
+                        legend: { labels: { color: '#cbd5e1' } } 
+                    },
                     scales: {
                         y: { ticks: { color: '#cbd5e1' }, grid: { color: '#334155' } },
                         x: { ticks: { color: '#cbd5e1' }, grid: { color: 'transparent' } }
@@ -310,7 +403,7 @@
             });
         }
 
-        window.onload = fetchData;
+        window.onload = () => setMode('hist-mes');
     </script>
 </body>
 </html>
