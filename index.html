@@ -142,18 +142,63 @@
             font-size: 1.2rem;
             color: var(--text-muted);
         }
+        /* Modales */
+        .modal {
+            display: none; 
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.75); z-index: 1000; 
+            justify-content: center; align-items: center;
+        }
+        .modal-content {
+            background: var(--surface); padding: 30px; border-radius: 12px; 
+            width: 90%; max-width: 600px; max-height: 80vh; overflow-y: auto; 
+            border: 1px solid var(--border); box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+            position: relative;
+        }
+        .close-btn {
+            position: absolute; top: 15px; right: 20px;
+            cursor: pointer; font-size: 1.5rem; color: var(--text-muted);
+        }
+        .close-btn:hover { color: var(--text); }
+        .tabs { display: flex; gap: 10px; margin-bottom: 20px; border-bottom: 1px solid var(--border); padding-bottom: 10px; }
+        .tab-btn { 
+            padding: 8px 16px; cursor: pointer; background: var(--bg); 
+            border: 1px solid var(--border); color: var(--text-muted); border-radius: 6px; 
+        }
+        .tab-btn.active { background: var(--primary); color: #fff; border-color: var(--primary); }
+        .tab-pane { display: none; line-height: 1.6; color: var(--text-muted); }
+        .tab-pane.active { display: block; color: var(--text); }
     </style>
 </head>
 <body>
     <div class="container">
-        <header>
-            <h1>⚡ Sunpower Solar Analytics</h1>
-            <p>Análisis y Pronóstico de Producción Solar | 9.9400298, -84.0474052</p>
+        <header style="margin-bottom: 40px;">
+            <!-- Logos -->
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; padding: 10px 20px; background: #fff; border-radius: 8px;">
+                <img src="https://www.tec.ac.cr/themes/custom/tecnologico/logo.svg" alt="TEC Logo" style="height: 45px;">
+                <img src="https://uned.ac.cr/themes/custom/uned/img/uned_logo_header_2025.svg" alt="UNED Logo" style="height: 45px;">
+            </div>
+            
+            <!-- Encabezado Académico -->
+            <div style="text-align: center; font-size: 0.95rem; color: var(--text-muted); line-height: 1.5; margin-bottom: 25px;">
+                <strong style="color: var(--text); font-size: 1.1rem;">INSTITUTO TECNOLÓGICO DE COSTA RICA</strong><br>
+                ESCUELA DE INGENIERÍA EN PRODUCCIÓN INDUSTRIAL<br>
+                MAESTRÍA EN SISTEMAS MODERNOS DE MANUFACTURA<br><br>
+                <strong style="color: var(--primary);">Título:</strong> Modelo contingencial energético sustentable para la Editorial EUNED, basado en elementos de eficiencia y continuidad operativa de los procesos productivos<br>
+                <strong>Autora:</strong> Pamela María Rodríguez Bolaños | <strong>Desarrollo:</strong> Edgar Eugenio Méndez Durán
+            </div>
+            
+            <div class="btn-group">
+                <button class="btn" onclick="openModal('modal-marco')">📖 Marco Teórico</button>
+                <button class="btn" onclick="openModal('modal-metodologia')">⚙️ Metodología</button>
+            </div>
+
+            <hr style="border-color: var(--border); margin: 25px 0;">
             
             <div class="btn-group">
                 <button class="btn active" id="btn-hist-mes" onclick="setMode('hist-mes')">📅 Histórico Mensual (2020-2025)</button>
                 <button class="btn" id="btn-hist-dia" onclick="setMode('hist-dia')">📆 Histórico Diario (2020-2025)</button>
-                <button class="btn" id="btn-fcst-16d" onclick="setMode('fcst-16d')">🔮 Pronóstico 16 Días</button>
+                <button class="btn" id="btn-fcst-16d" onclick="setMode('fcst-16d')">🔮 Próximos 16 días</button>
                 <button class="btn" id="btn-fcst-ano" onclick="setMode('fcst-ano')">📊 Pronóstico Anual (TMY)</button>
             </div>
         </header>
@@ -162,6 +207,11 @@
 
         <div id="content" style="display: none;">
             
+            <!-- Mapa Híbrido Estático -->
+            <div class="card" style="margin-bottom: 30px; padding: 0; overflow: hidden; height: 250px; border-radius: 12px;">
+                <iframe src="https://maps.google.com/maps?q=9.9400298,-84.0474052&t=h&z=17&ie=UTF8&iwloc=&output=embed" width="100%" height="100%" frameborder="0" style="border:0;" allowfullscreen loading="lazy"></iframe>
+            </div>
+
             <div class="slicer-container" id="slicer-panel">
                 <div class="slicer-inputs">
                     <div>
@@ -210,6 +260,51 @@
         </div>
     </div>
 
+    <!-- Modales -->
+    <div id="modal-marco" class="modal">
+        <div class="modal-content">
+            <span class="close-btn" onclick="closeModal('modal-marco')">&times;</span>
+            <h2 style="color: var(--primary); margin-top: 0;">Marco Teórico</h2>
+            <div class="tabs">
+                <button class="tab-btn active" onclick="switchTab('marco', 'tecnico')">Para Técnicos</button>
+                <button class="tab-btn" onclick="switchTab('marco', 'publico')">Explicación Sencilla</button>
+            </div>
+            <div id="marco-tecnico" class="tab-pane active">
+                <p><strong>1. Continuidad Operativa:</strong> Pasar de una descripción conceptual hacia una justificación ingenieril más robusta del modelo propuesto. Profundizar el análisis técnico y crítico de los conceptos energéticos.</p>
+                <p><strong>2. Rigor Científico:</strong> Fortalecer el uso de literatura científica especializada y journals indexados recientes, para incrementar el rigor académico y científico del proyecto en temas de resiliencia energética y confiabilidad operativa.</p>
+            </div>
+            <div id="marco-publico" class="tab-pane">
+                <p>Este proyecto se basa en estudiar cómo asegurar que la EUNED siempre tenga energía para funcionar (resiliencia energética), pase lo que pase.</p>
+                <p>Buscamos soluciones en libros y estudios científicos actualizados para asegurar que el sistema sea confiable, no falle y la energía esté siempre disponible cuando se necesita.</p>
+            </div>
+        </div>
+    </div>
+
+    <div id="modal-metodologia" class="modal">
+        <div class="modal-content">
+            <span class="close-btn" onclick="closeModal('modal-metodologia')">&times;</span>
+            <h2 style="color: var(--primary); margin-top: 0;">Metodología</h2>
+            <div class="tabs">
+                <button class="tab-btn active" onclick="switchTab('metodo', 'tecnico')">Para Técnicos</button>
+                <button class="tab-btn" onclick="switchTab('metodo', 'publico')">Explicación Sencilla</button>
+            </div>
+            <div id="metodo-tecnico" class="tab-pane active">
+                <p><strong>1. Definición de Variables:</strong> Definir con mayor precisión las variables críticas, KPI y criterios de aceptación para robustecer la validación cuantitativa de la propuesta.</p>
+                <p><strong>2. Simulación:</strong> Desarrollar con mayor detalle la estrategia de simulación, explicando escenarios, herramientas, horizonte de análisis y lógica de evaluación.</p>
+                <p><strong>3. Trazabilidad:</strong> Fortalecer la trazabilidad entre objetivos, actividades, herramientas y entregables para mejorar la coherencia y seguimiento técnico.</p>
+                <p><strong>4. Modelo Sistémico:</strong> Integrar las herramientas diagnósticas, energéticas y operativas dentro de un modelo unificado para elevar el nivel de ingeniería aplicada.</p>
+            </div>
+            <div id="metodo-publico" class="tab-pane">
+                <p>Es el "paso a paso" de cómo vamos a resolver el problema:</p>
+                <ul>
+                    <li>Vamos a definir metas claras y medibles (indicadores).</li>
+                    <li>Usaremos simulaciones por computadora para probar qué pasaría en la vida real.</li>
+                    <li>Llevaremos un orden estricto desde el inicio hasta el final para asegurarnos de que la solución realmente funcione bien junta como un todo.</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
     <script>
         const LAT = 9.9400298;
         const LON = -84.0474052;
@@ -226,6 +321,28 @@
             'hist': null,
             'fcst16': null
         };
+
+        // Funciones de Modal
+        function openModal(id) {
+            document.getElementById(id).style.display = 'flex';
+        }
+        function closeModal(id) {
+            document.getElementById(id).style.display = 'none';
+        }
+        function switchTab(modalPrefix, tab) {
+            const modal = document.getElementById(`modal-${modalPrefix === 'marco' ? 'marco' : 'metodologia'}`);
+            modal.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            modal.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
+            
+            event.target.classList.add('active');
+            document.getElementById(`${modalPrefix}-${tab}`).classList.add('active');
+        }
+        
+        window.onclick = function(event) {
+            if (event.target.classList.contains('modal')) {
+                event.target.style.display = "none";
+            }
+        }
 
         async function setMode(mode) {
             currentMode = mode;
