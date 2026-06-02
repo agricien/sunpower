@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sunpower - Análisis Histórico de Producción Solar</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --bg: #0f172a;
+            --surface: #1e293b;
+            --primary: #f59e0b;
+            --text: #f8fafc;
+            --text-muted: #94a3b8;
+            --border: #334155;
+            --accent: #3b82f6;
+        }
+        body {
+            background-color: var(--bg);
+            color: var(--text);
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        h1 {
+            color: var(--primary);
+            margin-bottom: 5px;
+        }
+        p {
+            color: var(--text-muted);
+            margin-top: 0;
+        }
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        .card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+        }
+        .card-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--primary);
+            margin: 10px 0;
+        }
+        .card-label {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .charts-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 20px;
+        }
+        .chart-container {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+            height: 400px;
+        }
+        .loader {
+            text-align: center;
+            padding: 50px;
+            font-size: 1.2rem;
+            color: var(--text-muted);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>⚡ Sunpower Solar Analytics</h1>
+            <p>Análisis de Producción Solar 2025 | 9.9400298, -84.0474052</p>
+        </header>
+
+        <div id="loading" class="loader">Cargando datos históricos de Open-Meteo...</div>
+
+        <div id="content" style="display: none;">
+            <div class="summary-grid">
+                <div class="card">
+                    <div class="card-label">Producción Real Total</div>
+                    <div class="card-value" id="total-real">0 kWh</div>
+                    <div class="card-label">Generación Estimada (1 kWp)</div>
+                </div>
+                <div class="card">
+                    <div class="card-label">Eficiencia Promedio (PR)</div>
+                    <div class="card-value" id="avg-pr">0%</div>
+                    <div class="card-label">Rendimiento del Sistema</div>
+                </div>
+                <div class="card">
+                    <div class="card-label">Radiación Global (GHI)</div>
+                    <div class="card-value" id="total-ghi">0 kWh/m²</div>
+                    <div class="card-label">Radiación Anual Total</div>
+                </div>
+                <div class="card">
+                    <div class="card-label">Pérdida por Variables</div>
+                    <div class="card-value" style="color: #ef4444;" id="total-loss">0%</div>
+                    <div class="card-label">Temp, Nubes, Lluvia</div>
+                </div>
+            </div>
+
+            <div class="charts-grid">
+                <div class="chart-container">
+                    <canvas id="productionChart"></canvas>
+                </div>
+                <div class="chart-container">
+                    <canvas id="weatherChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const LAT = 9.9400298;
+        const LON = -84.0474052;
+        const START_DATE = "2025-01-01";
+        const END_DATE = "2025-12-31";
+        const KWP = 1.0;
+
+        async function fetchData() {
+            const url = `https://archive-api.open-meteo.com/v1/archive?latitude=${LAT}&longitude=${LON}&start_date=${START_DATE}&end_date=${END_DATE}&timezone=America/Costa_Rica&daily=temperature_2m_max,precipitation_sum,shortwave_radiation_sum,cloudcover_mean,relative_humidity_2m_mean`;
+            
+            try {
+                const response = await fetch(url);
+                const data = await response.json();
+                processData(data);
+            } catch (err) {
+                console.error(err);
+                document.getElementById("loading").innerText = "Error al cargar los datos.";
+            }
+        }
+
+        function processData(data) {
+            const dates = data.daily.time;
+            const temps = data.daily.temperature_2m_max;
+            const rains = data.daily.precipitation_sum;
+            const clouds = data.daily.cloudcover_mean;
+            const humids = data.daily.relative_humidity_2m_mean;
+            const ghis_mj = data.daily.shortwave_radiation_sum;
+
+            let totalReal = 0;
+            let totalGhi = 0;
+            let totalPR = 0;
+
+            let dailyReal = [];
+            let dailyNominal = [];
+            let dailyPR = [];
+
+            // Mensual aggregation for smoother charts
+            let monthly = Array(12).fill(0).map(() => ({
+                real: 0, nominal: 0, ghi: 0, temp: 0, rain: 0, cloud: 0, humid: 0, days: 0
+            }));
+
+            for (let i = 0; i < dates.length; i++) {
+                let dateObj = new Date(dates[i] + 'T00:00:00');
+                let startOfYear = new Date(dateObj.getFullYear(), 0, 0);
+                let diff = dateObj - startOfYear;
+                let oneDay = 1000 * 60 * 60 * 24;
+                let julianDay = Math.floor(diff / oneDay);
+
+                let ghi_kwh = (ghis_mj[i] || 0) / 3.6; 
+                let temp = temps[i] || 0;
+                let cloud = clouds[i] || 0;
+                let rain = rains[i] || 0;
+                let humid = humids[i] || 0;
+
+                // Formulas
+                let factorOrbital = 1 + 0.033 * Math.cos(2 * Math.PI * julianDay / 365);
+                let nominal = KWP * ghi_kwh * factorOrbital;
+
+                let prBase = 0.75;
+                let prTemp = temp > 25 ? (temp - 25) * 0.0035 : 0;
+                let prCloud = cloud > 20 ? (cloud - 20) * 0.001 : 0;
+                let prRain = rain * 0.01;
+                
+                let prFinal = prBase - prTemp - prCloud - prRain;
+                if (prFinal < 0) prFinal = 0;
+
+                let real = nominal * prFinal;
+
+                totalReal += real;
+                totalGhi += ghi_kwh;
+                totalPR += prFinal;
+
+                dailyReal.push(real);
+                dailyNominal.push(nominal);
+                dailyPR.push(prFinal * 100);
+
+                let m = dateObj.getMonth();
+                monthly[m].real += real;
+                monthly[m].nominal += nominal;
+                monthly[m].ghi += ghi_kwh;
+                monthly[m].temp += temp;
+                monthly[m].rain += rain;
+                monthly[m].cloud += cloud;
+                monthly[m].humid += humid;
+                monthly[m].days += 1;
+            }
+
+            let avgPR = (totalPR / dates.length) * 100;
+            let avgLoss = 75 - avgPR; // Base is 75%
+
+            document.getElementById("total-real").innerText = totalReal.toFixed(0) + " kWh";
+            document.getElementById("avg-pr").innerText = avgPR.toFixed(1) + "%";
+            document.getElementById("total-ghi").innerText = totalGhi.toFixed(0) + " kWh/m²";
+            document.getElementById("total-loss").innerText = "-" + avgLoss.toFixed(1) + "%";
+
+            document.getElementById("loading").style.display = "none";
+            document.getElementById("content").style.display = "block";
+
+            renderCharts(monthly);
+        }
+
+        function renderCharts(monthly) {
+            const labels = ["Ene", "Feb", "Mar", "Abr", "May", "Jun", "Jul", "Ago", "Sep", "Oct", "Nov", "Dic"];
+            const realData = monthly.map(m => m.real);
+            const nominalData = monthly.map(m => m.nominal);
+
+            const ctxProd = document.getElementById('productionChart').getContext('2d');
+            new Chart(ctxProd, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [
+                        {
+                            label: 'Producción Real (kWh)',
+                            data: realData,
+                            backgroundColor: '#f59e0b',
+                            borderRadius: 4
+                        },
+                        {
+                            label: 'Producción Nominal (kWh)',
+                            data: nominalData,
+                            backgroundColor: 'rgba(59, 130, 246, 0.5)',
+                            borderRadius: 4
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { title: { display: true, text: 'Producción Solar Mensual (2025)', color: '#f8fafc' }, legend: { labels: { color: '#cbd5e1' } } },
+                    scales: {
+                        y: { ticks: { color: '#cbd5e1' }, grid: { color: '#334155' } },
+                        x: { ticks: { color: '#cbd5e1' }, grid: { color: 'transparent' } }
+                    }
+                }
+            });
+
+            const tempData = monthly.map(m => m.temp / m.days);
+            const humidData = monthly.map(m => m.humid / m.days);
+            const cloudData = monthly.map(m => m.cloud / m.days);
+
+            const ctxWea = document.getElementById('weatherChart').getContext('2d');
+            new Chart(ctxWea, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [
+                        {
+                            label: 'Temp Máx Prom (°C)',
+                            data: tempData,
+                            borderColor: '#ef4444',
+                            tension: 0.4
+                        },
+                        {
+                            label: 'Humedad Prom (%)',
+                            data: humidData,
+                            borderColor: '#3b82f6',
+                            tension: 0.4
+                        },
+                        {
+                            label: 'Nubosidad Prom (%)',
+                            data: cloudData,
+                            borderColor: '#94a3b8',
+                            borderDash: [5, 5],
+                            tension: 0.4
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { title: { display: true, text: 'Variables Meteorológicas Mensuales (2025)', color: '#f8fafc' }, legend: { labels: { color: '#cbd5e1' } } },
+                    scales: {
+                        y: { ticks: { color: '#cbd5e1' }, grid: { color: '#334155' } },
+                        x: { ticks: { color: '#cbd5e1' }, grid: { color: 'transparent' } }
+                    }
+                }
+            });
+        }
+
+        window.onload = fetchData;
+    </script>
+</body>
+</html>
