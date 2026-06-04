@@ -263,7 +263,37 @@
                 <div class="card">
                     <div class="card-label">Eficiencia Promedio (PR)</div>
                     <div class="card-value" id="avg-pr">0%</div>
-                    <div clas<!-- Modales -->
+                    <div class="card-label">Rendimiento del Sistema</div>
+                </div>
+                <div class="card">
+                    <div class="card-label">Radiación Global (GHI)</div>
+                    <div class="card-value" id="total-ghi">0 kWh/m²</div>
+                    <div class="card-label">Radiación Anual Promedio</div>
+                </div>
+                <div class="card">
+                    <div class="card-label">Horas Sol Promedio</div>
+                    <div class="card-value" id="avg-sun" style="color: #fbbf24;">0 h</div>
+                    <div class="card-label">Insolación Diaria</div>
+                </div>
+                <div class="card">
+                    <div class="card-label">Pérdida por Variables</div>
+                    <div class="card-value" style="color: #ef4444;" id="total-loss">0%</div>
+                    <div class="card-label">Temp, Nubes, Lluvia</div>
+                </div>
+            </div>
+
+            <div class="charts-grid">
+                <div class="chart-container">
+                    <canvas id="productionChart"></canvas>
+                </div>
+                <div class="chart-container">
+                    <canvas id="weatherChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modales -->
     <div id="modal-docs" class="modal">
         <div class="modal-content" style="max-width: 950px; padding: 0; display: flex; flex-direction: row; height: 85vh;">
             <span class="close-btn" onclick="closeModal('modal-docs')" style="z-index: 100; right: 25px; top: 15px;">&times;</span>
@@ -348,7 +378,7 @@
                     <p><strong>Causas Raíz Integradas:</strong> La vulnerabilidad se origina simultáneamente por (A) Caídas de red CNFL a 108.6V, (B) Arranque interno de motores de hasta 735A, y finalmente, (C) La ausencia de un soporte de transferencia BESS que conmute en <strong>menos de 8 milisegundos</strong> (Umbral de tolerancia residual de las fuentes de poder según ITIC/CBEMA).</p>
                     
                     <h3>Matriz AMEF (IEC 60812)</h3>
-                    <p>La estación de <strong>Impresión Digital (Xerox Igen 4)</strong> sufre el modo de falla más crítico alcanzando un Índice de Prioridad de Riesgo (IPR) de <strong>648 puntos</strong> (estándar tolerado es < 200):</p>
+                    <p>La estación de <strong>Impresión Digital (Xerox Igen 4)</strong> sufre el modo de falla más crítico alcanzando un Índice de Prioridad de Riesgo (IPR) de <strong>648 puntos</strong> (estándar tolerado es &lt; 200):</p>
                     <ul>
                         <li><strong>Severidad (9):</strong> Daño de equipo extremadamente costoso y detención instantánea del FFBD.</li>
                         <li><strong>Ocurrencia (8):</strong> Confirmado empíricamente que los sags suceden de manera frecuente.</li>
@@ -418,31 +448,7 @@
             </div>
         </div>
     </div>
-ul>
-            </div>
-        </div>
-    </div>
-
-    <div id="modal-about" class="modal">
-        <div class="modal-content" style="text-align: center;">
-            <span class="close-btn" onclick="closeModal('modal-about')">&times;</span>
-            <h2 style="color: var(--primary); margin-top: 0;">Acerca del Proyecto</h2>
-            <div style="color: var(--text); line-height: 1.6; margin-bottom: 20px;">
-                <p><strong>Autora:</strong> Pamela María Rodríguez Bolaños</p>
-                <p><strong>Desarrollo:</strong> Edgar Eugenio Méndez Durán</p>
-            </div>
-            <hr style="border-color: var(--border); margin: 20px 0;">
-            <div style="color: var(--text-muted);">
-                <p style="margin-bottom: 15px; font-weight: 600;">Patrocinio:</p>
-                <a href="https://www.agricien.com/" target="_blank">
-                    <img src="https://images.squarespace-cdn.com/content/v1/5bd1dc11c46f6d371c488433/1579306779524-ALJQVXHQ1OC7MMUQTLW2/AgriCien_Logo_Sencillo.png?format=500w" alt="Agricultura Científica" style="height: 60px; border-radius: 8px; background: #fff; padding: 10px;">
-                </a>
-                <p style="margin-top: 10px;">Agricultura Científica</p>
-            </div>
-        </div>
-    </div>
-
-    <script>
+<script>
         const LAT = 9.9400298;
         const LON = -84.0474052;
         const KWP = 1.0;
