@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
+    <link rel="icon" href="data:;base64,iVBORw0KGgo=">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sunpower - Análisis Histórico de Producción Solar</title>
@@ -298,12 +299,12 @@
                     <div class="card-label">Generación Estimada Anual</div>
                 </div>
                 <div class="card">
-                    <div class="card-label">Eficiencia Promedio (PR)</div>
+                    <div class="card-label">Eficiencia Promedio (Performance Ratio (PR))</div>
                     <div class="card-value" id="avg-pr">0%</div>
                     <div class="card-label">Rendimiento del Sistema</div>
                 </div>
                 <div class="card">
-                    <div class="card-label">Radiación Global (GHI)</div>
+                    <div class="card-label">Radiación Global (Global Horizontal Irradiance (GHI))</div>
                     <div class="card-value" id="total-ghi">0 kWh/m²</div>
                     <div class="card-label">Radiación Anual Promedio</div>
                 </div>
@@ -346,16 +347,16 @@
                     <button class="doc-tab-btn" onclick="switchDocTab('doc-falla')">Árbol de Fallas (FTA y AMEF)</button>
                     <button class="doc-tab-btn" onclick="switchDocTab('doc-oee')">Línea Base y Desempeño</button>
                     <button class="doc-tab-btn" onclick="switchDocTab('doc-viabilidad')">Viabilidad Técnica y Legal</button>
-                    <button class="doc-tab-btn" onclick="switchDocTab('doc-about')">Acerca del Proyecto</button>
-                
                     <hr style="border-color: var(--border); width: 80%; margin: 10px auto;">
                     <strong style="color: var(--text-muted); font-size: 0.8rem; padding-left: 15px;">Implementación (Cap V)</strong>
                     <button class="doc-tab-btn" onclick="switchDocTab('doc-arquitectura')">Arquitectura Microred</button>
-                    <button class="doc-tab-btn" onclick="switchDocTab('doc-bess')">BESS On-Line</button>
+                    <button class="doc-tab-btn" onclick="switchDocTab('doc-bess')">Battery Energy Storage System (BESS) On-Line</button>
                     <button class="doc-tab-btn" onclick="switchDocTab('doc-solar')">Dimensionamiento Solar</button>
-                    <button class="doc-tab-btn" onclick="switchDocTab('doc-ems')">EMS y Calidad (IEEE 519)</button>
+                    <button class="doc-tab-btn" onclick="switchDocTab('doc-ems')">Energy Management System (EMS) y Calidad (IEEE 519)</button>
                     <button class="doc-tab-btn" onclick="switchDocTab('doc-despliegue')">Fases de Despliegue</button>
                     <button class="doc-tab-btn" onclick="switchDocTab('doc-referencias')">Referencias</button>
+                    <hr style="border-color: var(--border); width: 80%; margin: 10px auto;">
+                    <button class="doc-tab-btn" onclick="switchDocTab('doc-about')">Acerca del Proyecto</button>
 </div>
             </div>
             
@@ -387,7 +388,7 @@
                     <p><strong>Social:</strong> Alta expectativa de disponibilidad de materiales didácticos impresos a nivel nacional para estudiantes de 37 sedes, lo que obliga a blindar el proceso productivo.</p>
                     <p><strong>Tecnológico:</strong> Madurez comercial de sistemas BESS, microredes inteligentes y modelado estocástico.</p>
                     <p><strong>Ecológico:</strong> Aprovechamiento de la radiación solar (GHI) local para disminuir huella de carbono y ruido de diésel.</p>
-                    <p><strong>Legal:</strong> Norma AR-NT-SUCAL que establece los límites de calidad, contrastando fuertemente con la realidad de caídas de tensión (sags a 108.6V) provenientes de la CNFL.</p>
+                    <p><strong>Legal:</strong> Norma AR-NT-SUCAL que establece los límites de calidad, contrastando fuertemente con la realidad de caídas de tensión (sags a 108.6V) provenientes de la Compañía Nacional de Fuerza y Luz (CNFL).</p>
                     
                     <h3>Entorno de Incertidumbre (VUCA)</h3>
                     <p><strong>Volatilidad (V):</strong> Alta velocidad de fluctuación eléctrica que apaga instantáneamente los centros de impresión digital.</p>
@@ -474,6 +475,20 @@
                     </ul>
                 </div>
                 
+                
+                <!-- Tab Referencias -->
+                <div id="doc-referencias" class="doc-tab-pane">
+                    <h2 style="color: var(--primary); margin-top: 0;">Referencias Bibliográficas</h2>
+                    <ul>
+                        <li>AlFaraj, J., et al. (2024). Solar irradiance database comparison for PV system design. <em>Sustainability</em>.</li>
+                        <li>Asamblea Legislativa de la República de Costa Rica. (2022). <em>Ley N.° 10086: Promoción y regulación de recursos energéticos distribuidos</em>.</li>
+                        <li>Autoridad Reguladora de los Servicios Públicos (ARESEP). (2023). <em>Metodología para generación distribuida</em>.</li>
+                        <li>Eaton. (s.f.). <em>Choosing the optimal UPS topology</em>.</li>
+                        <li>Hossain, M. I., et al. (2025). Enhancing microgrid resilience through integrated grid-forming inverter strategies. <em>Scientific Reports</em>.</li>
+                        <li>Institute of Electrical and Electronics Engineers. (2022). <em>IEEE Std 519-2022</em>.</li>
+                    </ul>
+                </div>
+
                 <!-- Tab About -->
                 <div id="doc-about" class="doc-tab-pane">
                     <h2 style="color: var(--primary); margin-top: 0;">Acerca del Proyecto</h2>
@@ -520,12 +535,12 @@
         }
         
         
-        let baseFontSize = 16;
+        let zoomLevel = 1;
         function changeFontSize(step) {
-            baseFontSize += step * 2;
-            if(baseFontSize < 12) baseFontSize = 12;
-            if(baseFontSize > 24) baseFontSize = 24;
-            document.body.style.fontSize = baseFontSize + 'px';
+            zoomLevel += step * 0.1;
+            if(zoomLevel < 0.7) zoomLevel = 0.7;
+            if(zoomLevel > 1.5) zoomLevel = 1.5;
+            document.body.style.zoom = zoomLevel;
         }
         
         let isColorblind = false;
@@ -549,8 +564,9 @@
             document.querySelectorAll('.doc-tab-btn').forEach(b => b.classList.remove('active'));
             document.querySelectorAll('.doc-tab-pane').forEach(p => p.classList.remove('active'));
             
-            event.target.classList.add('active');
-            document.getElementById(tabId).classList.add('active');
+            if (event && event.target) event.target.classList.add('active');
+            let el = document.getElementById(tabId);
+            if (el) el.classList.add('active');
         }
 
         function switchTab(modalPrefix, tab) {
