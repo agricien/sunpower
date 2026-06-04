@@ -21,7 +21,7 @@
         body {
             background-color: var(--bg);
             color: var(--text);
-            font-family: 'Inter', sans-serif;
+            font-family: 'Ecofont Sans', 'Century Gothic', 'Inter', sans-serif;
             margin: 0;
             padding: 20px;
         }
@@ -183,7 +183,7 @@
     
         .doc-sidebar { width: 260px; min-width: 260px; background: var(--bg); border-right: 1px solid var(--border); border-radius: 12px 0 0 12px; display: flex; flex-direction: column; overflow-y: auto; }
         .doc-menu { display: flex; flex-direction: column; padding: 10px; }
-        .doc-tab-btn { background: transparent; color: var(--text-muted); border: none; padding: 12px 15px; text-align: left; cursor: pointer; border-radius: 6px; font-size: 0.95rem; margin-bottom: 5px; transition: 0.2s; font-family: 'Inter', sans-serif;}
+        .doc-tab-btn { background: transparent; color: var(--text-muted); border: none; padding: 12px 15px; text-align: left; cursor: pointer; border-radius: 6px; font-size: 0.95rem; margin-bottom: 5px; transition: 0.2s; font-family: 'Ecofont Sans', 'Century Gothic', 'Inter', sans-serif;}
         .doc-tab-btn:hover { background: var(--surface); color: var(--text); }
         .doc-tab-btn.active { background: var(--primary); color: #fff; font-weight: bold; }
         .doc-tab-pane { display: none; line-height: 1.6; color: var(--text-muted); }
@@ -196,12 +196,49 @@
             .doc-content-area { max-height: 50vh !important; }
         }
 
+    
+        /* Accesibilidad y Daltonismo */
+        body.colorblind {
+            --primary: #3b82f6; /* Cambiar naranja a azul principal */
+            --bg: #1e1e1e;
+            --surface: #2d2d2d;
+            --border: #555;
+            --text: #ffffff;
+            --text-muted: #cccccc;
+        }
+        body.colorblind .card-value { color: #60a5fa; } /* Azul claro */
+        body.colorblind #total-loss { color: #facc15 !important; } /* Amarillo alerta en lugar de rojo */
+        body.colorblind #avg-sun { color: #fcd34d !important; } 
+        
+        .access-bar {
+            display: flex; justify-content: flex-end; gap: 10px; margin-bottom: 15px;
+        }
+        .access-btn {
+            background: var(--surface); color: var(--text); border: 1px solid var(--border);
+            padding: 5px 10px; border-radius: 4px; cursor: pointer; font-size: 0.85rem; transition: 0.2s;
+        }
+        .access-btn:hover { background: var(--border); }
+        .eco-banner {
+            background: rgba(16, 185, 129, 0.1); border-left: 4px solid #10b981; padding: 10px 15px;
+            font-size: 0.85rem; color: var(--text); margin-bottom: 20px; border-radius: 4px;
+        }
+
     </style>
 </head>
 <body>
     <div class="container">
         <header style="margin-bottom: 40px;">
-            <!-- Logos -->
+            <div class="access-bar">
+                <button class="access-btn" onclick="changeFontSize(-1)">A-</button>
+                <button class="access-btn" onclick="changeFontSize(1)">A+</button>
+                <button class="access-btn" onclick="toggleColorblind()">👁️ Modo Daltonismo</button>
+            </div>
+
+            
+            <div class="eco-banner">
+                🌱 <strong>Sostenibilidad:</strong> Este sitio web utiliza tipografías ecológicas de bajo consumo (Ecofont Sans / Century Gothic). Si decide imprimir esta página, estará ahorrando hasta un 20% de tinta, reduciendo el impacto ambiental de los metales pesados.
+            </div>
+<!-- Logos -->
             <div class="logos-container" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; padding: 10px 20px; background: #fff; border-radius: 8px;">
                 <img src="https://www.tec.ac.cr/themes/custom/tecnologico/logo.svg" alt="TEC Logo" class="tec-logo" style="height: 45px; background: #0f172a; padding: 5px 15px; border-radius: 4px;">
                 <img src="https://uned.ac.cr/themes/custom/uned/img/uned_logo_header_2025.svg" alt="UNED Logo" class="uned-logo" style="height: 45px;">
@@ -310,7 +347,16 @@
                     <button class="doc-tab-btn" onclick="switchDocTab('doc-oee')">Línea Base y Desempeño</button>
                     <button class="doc-tab-btn" onclick="switchDocTab('doc-viabilidad')">Viabilidad Técnica y Legal</button>
                     <button class="doc-tab-btn" onclick="switchDocTab('doc-about')">Acerca del Proyecto</button>
-                </div>
+                
+                    <hr style="border-color: var(--border); width: 80%; margin: 10px auto;">
+                    <strong style="color: var(--text-muted); font-size: 0.8rem; padding-left: 15px;">Implementación (Cap V)</strong>
+                    <button class="doc-tab-btn" onclick="switchDocTab('doc-arquitectura')">Arquitectura Microred</button>
+                    <button class="doc-tab-btn" onclick="switchDocTab('doc-bess')">BESS On-Line</button>
+                    <button class="doc-tab-btn" onclick="switchDocTab('doc-solar')">Dimensionamiento Solar</button>
+                    <button class="doc-tab-btn" onclick="switchDocTab('doc-ems')">EMS y Calidad (IEEE 519)</button>
+                    <button class="doc-tab-btn" onclick="switchDocTab('doc-despliegue')">Fases de Despliegue</button>
+                    <button class="doc-tab-btn" onclick="switchDocTab('doc-referencias')">Referencias</button>
+</div>
             </div>
             
             <!-- Contenido -->
@@ -473,6 +519,32 @@
             document.getElementById(id).style.display = 'none';
         }
         
+        
+        let baseFontSize = 16;
+        function changeFontSize(step) {
+            baseFontSize += step * 2;
+            if(baseFontSize < 12) baseFontSize = 12;
+            if(baseFontSize > 24) baseFontSize = 24;
+            document.body.style.fontSize = baseFontSize + 'px';
+        }
+        
+        let isColorblind = false;
+        function toggleColorblind() {
+            isColorblind = !isColorblind;
+            if (isColorblind) {
+                document.body.classList.add('colorblind');
+            } else {
+                document.body.classList.remove('colorblind');
+            }
+            // Re-renderizar gráficos con la nueva paleta
+            if (currentDailyData.length > 0) {
+                let startStr = document.getElementById('date-start').value;
+                let endStr = document.getElementById('date-end').value;
+                let filtered = currentDailyData.filter(d => d.date >= startStr && d.date <= endStr);
+                renderCharts(filtered, currentMode);
+            }
+        }
+
         function switchDocTab(tabId) {
             document.querySelectorAll('.doc-tab-btn').forEach(b => b.classList.remove('active'));
             document.querySelectorAll('.doc-tab-pane').forEach(p => p.classList.remove('active'));
@@ -784,13 +856,13 @@
                         {
                             label: 'Producción Real (kWh)',
                             data: realPlot,
-                            backgroundColor: '#f59e0b',
+                            backgroundColor: isColorblind ? '#3b82f6' : '#f59e0b',
                             borderRadius: 4
                         },
                         {
                             label: 'Producción Nominal (kWh)',
                             data: nominalPlot,
-                            backgroundColor: 'rgba(59, 130, 246, 0.5)',
+                            backgroundColor: isColorblind ? 'rgba(255, 152, 0, 0.5)' : 'rgba(59, 130, 246, 0.5)',
                             borderRadius: 4
                         }
                     ]
@@ -818,7 +890,7 @@
                         {
                             label: 'Temp Máx (°C)',
                             data: tempPlot,
-                            borderColor: '#ef4444',
+                            borderColor: isColorblind ? '#facc15' : '#ef4444',
                             tension: 0.4
                         },
                         {
