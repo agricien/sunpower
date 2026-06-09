@@ -209,7 +209,7 @@
         }
         body.colorblind .card-value { color: #60a5fa; } /* Azul claro */
         body.colorblind #total-loss { color: #facc15 !important; } /* Amarillo alerta en lugar de rojo */
-        body.colorblind #avg-sun { color: #fcd34d !important; } 
+        body.colorblind #hsp-value { color: #fcd34d !important; } 
         
         .access-bar {
             display: flex; justify-content: flex-end; gap: 10px; margin-bottom: 15px;
@@ -308,10 +308,10 @@
                     <div class="card-value" id="total-ghi">0 kWh/m²</div>
                     <div class="card-label">Radiación Anual Promedio</div>
                 </div>
-                <div class="card">
-                    <div class="card-label">Horas Sol Promedio</div>
-                    <div class="card-value" id="avg-sun" style="color: #fbbf24;">0 h</div>
-                    <div class="card-label">Insolación Diaria</div>
+                <div class="card" title="Equivalencia diaria a 1000 W/m²">
+                    <div class="card-label">Horas Solar Pico (HSP)</div>
+                    <div class="card-value" id="hsp-value" style="color: #fbbf24;">0 h</div>
+                    <div class="card-label" id="sun-hours-label">Insolación: 0 h</div>
                 </div>
                 <div class="card">
                     <div class="card-label">Pérdida por Variables</div>
@@ -783,6 +783,7 @@
             let avgPR = (totalPR / days) * 100;
             let avgLoss = 75 - avgPR;
             let avgSun = totalSun / days;
+            let hsp = totalGhi / days; // Average daily GHI is equivalent to HSP
             
             if (numYears > 1 && (mode === 'hist-mes' || mode === 'hist-dia' || mode === 'fcst-ano')) {
                 totalReal = totalReal / numYears;
@@ -792,7 +793,13 @@
             document.getElementById("total-real").innerText = totalReal.toFixed(0) + " kWh";
             document.getElementById("avg-pr").innerText = avgPR.toFixed(1) + "%";
             document.getElementById("total-ghi").innerText = totalGhi.toFixed(0) + " kWh/m²";
-            document.getElementById("avg-sun").innerText = avgSun.toFixed(1) + " h";
+            
+            let hspEl = document.getElementById("hsp-value");
+            if(hspEl) hspEl.innerText = hsp.toFixed(2) + " h";
+            
+            let sunLabelEl = document.getElementById("sun-hours-label");
+            if(sunLabelEl) sunLabelEl.innerText = "Insolación: " + avgSun.toFixed(1) + " h";
+            
             document.getElementById("total-loss").innerText = "-" + avgLoss.toFixed(1) + "%";
             
             renderCharts(filteredData, mode);
