@@ -450,7 +450,7 @@
                         <li><strong>Costo de Merma ($C_{merma}$):</strong> Maculatura y consumibles perdidos por paradas abruptas y recalibraciones.</li>
                     </ul>
 
-                    <h3 style="color: #1e40af; margin-top: 30px; border-top: 1px solid #e5e7eb; padding-top: 20px;">Análisis Matemático de OEE y COI</h3>
+                    <h3 style="color: var(--primary); margin-top: 30px; border-top: 1px solid var(--border); padding-top: 20px;">Análisis Matemático de OEE y COI</h3>
                     <p>Las fórmulas base utilizadas extraídas del archivo de cálculo (<code>Calculo OEE.xlsx</code>) son:</p>
                     <ul>
                         <li><strong>Disponibilidad (A):</strong> <code>(Tiempo Planificado - Tiempo Inoperante) / Tiempo Planificado</code></li>
@@ -467,42 +467,42 @@
                         <li>Costo Mermas: Sustrato $17.38/resma Offset, $3.20/resma Digital. (+7% costos indirectos tinta).</li>
                     </ul>
 
-                    <p style="background-color: #fef3c7; border-left: 4px solid #f59e0b; padding: 15px; border-radius: 4px;"><strong>Nota de Corrección Matemática:</strong> Durante la auditoría del archivo <code>Calculo OEE.xlsx</code>, se detectó una inversión crítica de referencias cruzadas. Las fórmulas de la Línea Digital sumaban los incidentes y mermas de Offset y viceversa. La tabla a continuación muestra el comportamiento <strong>real y corregido</strong>, rectificando el error original del archivo fuente.</p>
+                    <p style="background-color: rgba(245, 158, 11, 0.1); border-left: 4px solid #f59e0b; padding: 15px; border-radius: 4px; color: var(--text);"><strong>Nota de Corrección Matemática:</strong> Durante la auditoría del archivo <code>Calculo OEE.xlsx</code>, se detectó una inversión crítica de referencias cruzadas. Las fórmulas de la Línea Digital sumaban los incidentes y mermas de Offset y viceversa. La tabla a continuación muestra el comportamiento <strong>real y corregido</strong>, rectificando el error original del archivo fuente.</p>
 
                     <div style="overflow-x: auto; margin-top: 20px;">
                         <table style="width: 100%; border-collapse: collapse; margin-bottom: 20px;">
                             <thead>
-                                <tr style="background-color: #1e293b; color: white;">
+                                <tr style="background-color: var(--primary); color: white;">
                                     <th style="padding: 12px; text-align: left;">Métrica Corregida</th>
                                     <th style="padding: 12px; text-align: center;">Línea Digital</th>
                                     <th style="padding: 12px; text-align: center;">Línea Offset</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr style="background-color: #f9fafb; border-bottom: 1px solid #e5e7eb;">
+                                <tr style="border-bottom: 1px solid var(--border); background-color: rgba(255,255,255,0.02);">
                                     <td style="padding: 12px;"><strong>Tiempo Inoperante Real</strong></td>
                                     <td style="padding: 12px; text-align: center; color: #ef4444; font-weight: bold;">23.33 h</td>
                                     <td style="padding: 12px; text-align: center; color: #10b981; font-weight: bold;">0.16 h</td>
                                 </tr>
-                                <tr style="border-bottom: 1px solid #e5e7eb;">
+                                <tr style="border-bottom: 1px solid var(--border);">
                                     <td style="padding: 12px;"><strong>Disponibilidad (A)</strong></td>
                                     <td style="padding: 12px; text-align: center;">91.35%</td>
                                     <td style="padding: 12px; text-align: center;">99.93%</td>
                                 </tr>
-                                <tr style="background-color: #f9fafb; border-bottom: 1px solid #e5e7eb;">
+                                <tr style="border-bottom: 1px solid var(--border); background-color: rgba(255,255,255,0.02);">
                                     <td style="padding: 12px;"><strong>Rendimiento (P)</strong></td>
                                     <td style="padding: 12px; text-align: center;">100%</td>
                                     <td style="padding: 12px; text-align: center;">72.0%</td>
                                 </tr>
-                                <tr style="border-bottom: 1px solid #e5e7eb;">
+                                <tr style="border-bottom: 1px solid var(--border);">
                                     <td style="padding: 12px;"><strong>Calidad (Q)</strong></td>
                                     <td style="padding: 12px; text-align: center;">96.0%</td>
                                     <td style="padding: 12px; text-align: center;">90.0%</td>
                                 </tr>
-                                <tr style="background-color: #eff6ff; border-bottom: 2px solid #93c5fd;">
+                                <tr style="background-color: rgba(59, 130, 246, 0.1); border-bottom: 2px solid var(--primary);">
                                     <td style="padding: 12px; font-size: 1.1em;"><strong>Eficacia Global (OEE)</strong></td>
-                                    <td style="padding: 12px; text-align: center; font-size: 1.1em; font-weight: bold; color: #2563eb;">87.7%</td>
-                                    <td style="padding: 12px; text-align: center; font-size: 1.1em; font-weight: bold; color: #2563eb;">64.7%</td>
+                                    <td style="padding: 12px; text-align: center; font-size: 1.1em; font-weight: bold; color: var(--primary);">87.7%</td>
+                                    <td style="padding: 12px; text-align: center; font-size: 1.1em; font-weight: bold; color: var(--primary);">64.7%</td>
                                 </tr>
                             </tbody>
                         </table>
@@ -511,24 +511,24 @@
                     <div style="overflow-x: auto; margin-top: 10px;">
                         <table style="width: 100%; border-collapse: collapse; margin-bottom: 20px;">
                             <thead>
-                                <tr style="background-color: #475569; color: white;">
+                                <tr style="background-color: var(--primary); color: white;">
                                     <th style="padding: 12px; text-align: left;">Costo de Inacción (COI)</th>
                                     <th style="padding: 12px; text-align: right;">Digital</th>
                                     <th style="padding: 12px; text-align: right;">Offset</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr style="border-bottom: 1px solid #e5e7eb;">
+                                <tr style="border-bottom: 1px solid var(--border);">
                                     <td style="padding: 12px;">Costo de Tiempo Muerto (Laboral)</td>
                                     <td style="padding: 12px; text-align: right;">₡50,493.33</td>
                                     <td style="padding: 12px; text-align: right;">₡721.33</td>
                                 </tr>
-                                <tr style="background-color: #f9fafb; border-bottom: 1px solid #e5e7eb;">
+                                <tr style="border-bottom: 1px solid var(--border); background-color: rgba(255,255,255,0.02);">
                                     <td style="padding: 12px;">Costo de Mermas Materiales</td>
                                     <td style="padding: 12px; text-align: right;">₡1,342.20</td>
                                     <td style="padding: 12px; text-align: right;">₡4,091.25</td>
                                 </tr>
-                                <tr style="background-color: #fee2e2; border-bottom: 2px solid #fca5a5;">
+                                <tr style="background-color: rgba(239, 68, 68, 0.1); border-bottom: 2px solid #ef4444;">
                                     <td style="padding: 12px; font-weight: bold; color: #b91c1c;">Costo Total Inacción (COI)</td>
                                     <td style="padding: 12px; text-align: right; font-weight: bold; color: #b91c1c;">₡51,835.54</td>
                                     <td style="padding: 12px; text-align: right; font-weight: bold; color: #b91c1c;">₡4,812.58</td>
