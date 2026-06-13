@@ -340,6 +340,15 @@
             <div class="doc-sidebar">
                 <h3 style="margin-top: 0; color: var(--primary); padding: 25px 20px 10px 20px;">Documentación</h3>
                 <div class="doc-menu" id="doc-menu-container">
+                    <strong style="color: var(--primary); font-size: 0.8rem; padding-left: 15px;">🔧 Núcleo de Ingeniería (III Avance)</strong>
+                    <button class="doc-tab-btn" onclick="switchDocTab('doc-feedback')">Realimentación del Tutor</button>
+                    <button class="doc-tab-btn" onclick="switchDocTab('doc-carga')">Carga Eléctrica y Curva de Demanda</button>
+                    <button class="doc-tab-btn" onclick="switchDocTab('doc-escenarios')">Simulación de Escenarios de Falla</button>
+                    <button class="doc-tab-btn" onclick="switchDocTab('doc-autonomia')">Autonomía Energética (E_BESS)</button>
+                    <button class="doc-tab-btn" onclick="switchDocTab('doc-riesgo')">Riesgo de Indisponibilidad</button>
+                    <button class="doc-tab-btn" onclick="switchDocTab('doc-economico')">Análisis Económico (Línea Base)</button>
+                    <hr style="border-color: var(--border); width: 80%; margin: 10px auto;">
+                    <strong style="color: var(--text-muted); font-size: 0.8rem; padding-left: 15px;">Diagnóstico (Cap IV)</strong>
                     <button class="doc-tab-btn active" onclick="switchDocTab('doc-marco')">Marco Teórico</button>
                     <button class="doc-tab-btn" onclick="switchDocTab('doc-metodologia')">Metodología</button>
                     <button class="doc-tab-btn" onclick="switchDocTab('doc-pestel')">PESTEL & VUCA</button>
@@ -363,6 +372,132 @@
             <!-- Contenido -->
             <div class="doc-content-area" style="padding: 30px; padding-top: 45px; flex: 1; overflow-y: auto;">
                 
+                <!-- ============ NÚCLEO DE INGENIERÍA (III AVANCE) ============ -->
+
+                <!-- Tab Realimentación -->
+                <div id="doc-feedback" class="doc-tab-pane">
+                    <h2 style="color: var(--primary); margin-top: 0;">Realimentación del Tutor e Integración Ingenieril</h2>
+                    <div style="background: rgba(16, 185, 129, 0.08); border-left: 4px solid #10b981; padding: 15px; border-radius: 4px; color: var(--text); margin-bottom: 20px;">
+                        <p style="margin-top:0;"><strong style="color:#10b981;">Reconocimiento:</strong> "Se evidencia una comprensión madura de que los problemas energéticos no deben analizarse únicamente desde la perspectiva eléctrica, sino como factores que afectan directamente la continuidad operativa, la productividad y la sostenibilidad. (...) Convertir un riesgo operativo en una oportunidad de mejora estratégica mediante el uso disciplinado de datos, análisis y pensamiento sistémico."</p>
+                        <p style="margin-bottom:0;"><strong style="color:#f59e0b;">Oportunidad de fortalecimiento:</strong> Profundizar la <strong>cuantificación física y económica</strong> del impacto de cada escenario de interrupción, demostrando el entendimiento del problema <em>desde la ingeniería</em> (no solo el escaneo de vulnerabilidad organizacional).</p>
+                    </div>
+
+                    <p>El III Avance migra del diagnóstico cualitativo (10+ herramientas: PESTEL, VUCA, FODA, FTA, AMEF, ABC) hacia la <strong>modelación física y la cuantificación energética del sistema de manufactura</strong>. Cada interrogante planteada por el evaluador se responde explícitamente en las pestañas de este núcleo:</p>
+
+                    <div style="overflow-x:auto;">
+                    <table style="width:100%; border-collapse:collapse; margin-top:10px;">
+                        <thead><tr style="background-color: var(--primary); color:white;">
+                            <th style="padding:10px; text-align:left;">Pregunta del evaluador</th>
+                            <th style="padding:10px; text-align:left;">Respuesta de ingeniería</th>
+                        </tr></thead>
+                        <tbody>
+                            <tr style="border-bottom:1px solid var(--border);"><td style="padding:10px;">¿Dónde está el análisis de la carga eléctrica?</td><td style="padding:10px;">Factor de Carga (FC) = <strong>41.0 %</strong> → §Carga Eléctrica</td></tr>
+                            <tr style="border-bottom:1px solid var(--border); background:rgba(255,255,255,0.02);"><td style="padding:10px;">¿Dónde está la curva de la demanda?</td><td style="padding:10px;">Curva diaria 15-min + 3 zonas operacionales → §Carga Eléctrica</td></tr>
+                            <tr style="border-bottom:1px solid var(--border);"><td style="padding:10px;">¿Dónde está el perfil de horario de consumo?</td><td style="padding:10px;">Base nocturna / rampa-meseta 07:00–20:30 → §Carga Eléctrica</td></tr>
+                            <tr style="border-bottom:1px solid var(--border); background:rgba(255,255,255,0.02);"><td style="padding:10px;">¿Dónde está la autonomía requerida?</td><td style="padding:10px;">E_BESS = <strong>16.54 kWh</strong> (integral de potencia Zona A) → §Autonomía</td></tr>
+                            <tr style="border-bottom:1px solid var(--border);"><td style="padding:10px;">¿Dónde está la simulación de escenarios de falla?</td><td style="padding:10px;">Sag exógeno (½CV²) + inrush endógeno (735.1 A) → §Escenarios</td></tr>
+                            <tr style="border-bottom:1px solid var(--border); background:rgba(255,255,255,0.02);"><td style="padding:10px;">¿Dónde está el análisis económico de las alternativas?</td><td style="padding:10px;">Línea base T-GI: demanda + energía + penalización FP → §Económico</td></tr>
+                            <tr style="border-bottom:1px solid var(--border);"><td style="padding:10px;">¿Dónde está la cuantificación del riesgo de indisponibilidad?</td><td style="padding:10px;">U = <strong>1.76 %</strong> = 154.16 h/año de paro forzado → §Riesgo</td></tr>
+                        </tbody>
+                    </table>
+                    </div>
+                    <p style="font-size:0.85rem; color:var(--text-muted); margin-top:15px;"><em>Fuente: «Modelación Física y Cuantificación Energética del Sistema de Manufactura» (III Avance PMRB). El reto no es usar más herramientas, sino herramientas que expliquen el comportamiento físico y operativo del sistema a intervenir.</em></p>
+                </div>
+
+                <!-- Tab Carga Eléctrica y Curva de Demanda -->
+                <div id="doc-carga" class="doc-tab-pane">
+                    <h2 style="color: var(--primary); margin-top: 0;">2.6.1 Análisis de la Carga Eléctrica y Perfil Horario</h2>
+                    <p>Se trasciende la descripción cualitativa caracterizando analíticamente el comportamiento dinámico de la carga en el Tablero General (TG). El <strong>Factor de Carga (FC)</strong> relaciona la energía total consumida con la potencia de la demanda máxima registrada:</p>
+                    <p style="background:var(--bg); border:1px solid var(--border); padding:12px 16px; border-radius:6px; font-family:monospace; color:var(--text); text-align:center;">FC = E<sub>total</sub> / (P<sub>máx</sub> · T) = 1 753.08 kWh / (178.16 kW · 24 h) = <strong style="color:var(--primary);">0.410 → 41.0 %</strong></p>
+                    <p>Un FC del <strong>41.0 %</strong> confirma analíticamente un perfil de consumo <strong>altamente ineficiente y errático</strong>, típico de sistemas modernos de manufactura donde coexisten procesos intermitentes de alta fuerza inductiva (Zona C) con sistemas lógicos continuos (Zona A). La subutilización de la capacidad instalada y los picos severos durante la jornada diurna (07:00–20:30) justifican una estrategia de rasurado de picos (<em>Peak Shaving</em>) mediante almacenamiento electroquímico.</p>
+
+                    <h3>Curva de Demanda Diaria y Frontera de Operación BESS</h3>
+                    <p>Perfil real de la potencia activa en intervalos de 15 min (analizador Fluke 1738, Clase S) durante un ciclo de alta producción. El umbral de rasurado se fija en <strong>100 kW</strong>: el área sobre esa línea es la energía que el banco LiFePO₄ inyecta dinámicamente durante los transitorios.</p>
+                    <div style="background: var(--bg); border:1px solid var(--border); border-radius:8px; padding:15px; height:340px; margin-bottom:10px;">
+                        <canvas id="demandChart"></canvas>
+                    </div>
+                    <ul>
+                        <li><strong>Carga base pasiva (21:00–06:00):</strong> demanda constante &lt; 15 kW (servidores, iluminación, lazos de control en espera). Al cesar la maquinaria pesada, el ruido armónico y los transitorios se mitigan por completo.</li>
+                        <li><strong>Rampa y meseta de operación (07:00–20:30):</strong> acoplamiento síncrono Zona A + B + C. Demanda promedio máxima estabilizada en <strong>98.63 kW</strong>.</li>
+                        <li><strong>Crestas de disparo transitorio:</strong> picos erráticos hasta el <strong>178.16 kW</strong> absoluto (~10:00 h), no por mayor producción sino por superposición de corrientes de inserción (inrush) del compresor Atlas Copco de 18.5 kW.</li>
+                    </ul>
+                    <p style="background-color: rgba(245, 158, 11, 0.1); border-left: 4px solid #f59e0b; padding: 12px; border-radius: 4px; color: var(--text);"><strong>Justificación del set-point (100 kW):</strong> dimensionar para los 178.16 kW haría inviable el costo de inversores y almacenamiento. Limitando la demanda vista por la CNFL a un techo plano de 100 kW se logra (1) reducir el cargo por demanda máxima facturada, (2) evitar caídas de tensión (≤108.6 V) por la impedancia del nodo durante arranques inductivos, y (3) que el inversor híbrido actúe como filtro dinámico aislando la Zona A.</p>
+                </div>
+
+                <!-- Tab Escenarios de Falla -->
+                <div id="doc-escenarios" class="doc-tab-pane">
+                    <h2 style="color: var(--primary); margin-top: 0;">2.6.2 Simulación de Escenarios de Falla Sistémicos</h2>
+                    <p>Se modelan matemáticamente los dos escenarios críticos que detienen el flujo productivo, demostrando el comportamiento físico de la infraestructura ante los disturbios documentados.</p>
+
+                    <h3>Escenario A — Perturbación Dinámica Exógena (Sag de Voltaje)</h3>
+                    <p>El sag de la red CNFL se modela como un escalón donde la tensión cae bajo el umbral de inmunidad ITIC/CBEMA (V<sub>crit</sub> = 198 V para nominal de 208 V), alcanzando un mínimo de <strong>108.6 V</strong>. La energía en los capacitores de las fuentes conmutadas de la Xerox Iridesse se rige por el almacenamiento electrostático:</p>
+                    <p style="background:var(--bg); border:1px solid var(--border); padding:12px 16px; border-radius:6px; font-family:monospace; color:var(--text); text-align:center;">E = ½ · C · V² &nbsp;→&nbsp; ΔE = 1 − (108.6 / 208)² = <strong style="color:#ef4444;">−72.7 %</strong></p>
+                    <p>La energía disponible se deprime <strong>cuadráticamente un 72.7 %</strong>. Como la transferencia estática actual supera los 20 ms, se rebasa el <em>holdup time</em> de las fuentes, se interrumpe el lazo lógico y la prensa se apaga abruptamente. <strong>Mitigación:</strong> transferencia BESS On-Line ≤ 8 ms.</p>
+
+                    <h3>Escenario B — Perturbación Dinámica Endógena (Transitorio de Arranque)</h3>
+                    <p>El arranque del motor de inducción del compresor de tornillo Atlas Copco (18.5 kW) introduce una corriente de inserción cresta de <strong>I<sub>inrush</sub> = 735.1 A</strong>. La caída de tensión transitoria en las barras del TG es función de la impedancia del nodo:</p>
+                    <p style="background:var(--bg); border:1px solid var(--border); padding:12px 16px; border-radius:6px; font-family:monospace; color:var(--text); text-align:center;">ΔV<sub>trans</sub> = I<sub>inrush</sub> · Z<sub>nodo</sub></p>
+                    <p>Esta deflexión instantánea deforma la onda senoidal e induce estrés térmico en las tarjetas de control contiguas. Este fenómeno físico es la causa raíz de los <strong>17 fallos catastróficos</strong> por calidad de energía registrados en el variador de frecuencia del propio compresor.</p>
+                </div>
+
+                <!-- Tab Autonomía -->
+                <div id="doc-autonomia" class="doc-tab-pane">
+                    <h2 style="color: var(--primary); margin-top: 0;">2.6.3 Dimensión de la Autonomía Energética Requerida (E_BESS)</h2>
+                    <p>La capacidad de almacenamiento no se fija con criterios empíricos, sino como función restrictiva del inventario de cargas de la Zona A y el tiempo de estabilización operativa. La potencia nominal estricta a respaldar para aislar los centros lógicos sensibles es <strong>26.46 kW</strong> (Screen PlateRite 4300E + Xerox Iridesse + Xerox Nuvera).</p>
+                    <p>Para preservar la vida útil del banco de Litio-Ferrofosfato (LiFePO₄) ante el ciclado severo, se restringe la profundidad de descarga a <strong>DoD = 0.80</strong>. Con el tiempo crítico de restablecimiento y reinicio de sistemas lógicos t<sub>aut</sub> = 0.5 h (30 min):</p>
+                    <p style="background:var(--bg); border:1px solid var(--border); padding:12px 16px; border-radius:6px; font-family:monospace; color:var(--text); text-align:center;">E<sub>BESS</sub> = (P · t<sub>aut</sub>) / DoD = (26.46 kW · 0.5 h) / 0.80 = <strong style="color:var(--primary);">16.54 kWh</strong></p>
+                    <p>El modelado concluye que la microred requiere un banco con capacidad nominal mínima estricta de <strong>≈ 17 kWh</strong>. Este dimensionamiento optimiza la inversión de la universidad evitando sobredimensionar el sistema hacia cargas inductivas de la Zona C, que poseen su propia inercia mecánica.</p>
+                </div>
+
+                <!-- Tab Riesgo de Indisponibilidad -->
+                <div id="doc-riesgo" class="doc-tab-pane">
+                    <h2 style="color: var(--primary); margin-top: 0;">2.6.4 Cuantificación del Riesgo de Indisponibilidad (AS-IS)</h2>
+                    <p>Se procesan los <strong>376 eventos de falla anuales</strong> del controlador del compresor con indicadores estandarizados de ingeniería de confiabilidad (distribución exponencial, tasa de fallas constante).</p>
+                    <div style="overflow-x:auto;">
+                    <table style="width:100%; border-collapse:collapse; margin:15px 0;">
+                        <thead><tr style="background-color: var(--primary); color:white;">
+                            <th style="padding:10px; text-align:left;">Indicador</th>
+                            <th style="padding:10px; text-align:left;">Formulación</th>
+                            <th style="padding:10px; text-align:center;">Valor</th>
+                        </tr></thead>
+                        <tbody>
+                            <tr style="border-bottom:1px solid var(--border);"><td style="padding:10px;">Tasa de fallas (λ)</td><td style="padding:10px; font-family:monospace;">n / T<sub>op</sub> = 376 / 8760 h</td><td style="padding:10px; text-align:center;">0.0429 /h</td></tr>
+                            <tr style="border-bottom:1px solid var(--border); background:rgba(255,255,255,0.02);"><td style="padding:10px;">MTBF</td><td style="padding:10px; font-family:monospace;">1 / λ</td><td style="padding:10px; text-align:center;">22.96 h</td></tr>
+                            <tr style="border-bottom:1px solid var(--border);"><td style="padding:10px;">MTTR</td><td style="padding:10px; font-family:monospace;">limpieza mermas + reinicio lógico</td><td style="padding:10px; text-align:center;">0.41 h</td></tr>
+                            <tr style="border-bottom:1px solid var(--border); background:rgba(59,130,246,0.1);"><td style="padding:10px;"><strong>Disponibilidad (A)</strong></td><td style="padding:10px; font-family:monospace;">MTBF / (MTBF + MTTR)</td><td style="padding:10px; text-align:center; color:var(--primary); font-weight:bold;">98.24 %</td></tr>
+                            <tr style="border-bottom:1px solid var(--border); background:rgba(239,68,68,0.1);"><td style="padding:10px;"><strong>Indisponibilidad (U)</strong></td><td style="padding:10px; font-family:monospace;">1 − A</td><td style="padding:10px; text-align:center; color:#ef4444; font-weight:bold;">1.76 %</td></tr>
+                            <tr><td style="padding:10px;"><strong>Horas de paro forzado</strong></td><td style="padding:10px; font-family:monospace;">U · 8760 h</td><td style="padding:10px; text-align:center; color:#ef4444; font-weight:bold;">154.16 h/año</td></tr>
+                        </tbody>
+                    </table>
+                    </div>
+                    <p>En manufactura automatizada, una disponibilidad del 98.24 % implica <strong>154.16 horas de paro forzado anuales</strong> que interrumpen el flujo de valor institucional. El sistema propuesto se justifica no como respaldo pasivo, sino como <strong>acondicionador dinámico</strong> que eleva la disponibilidad hacia el umbral de "cuatro nueves" (99.99 %).</p>
+                </div>
+
+                <!-- Tab Análisis Económico -->
+                <div id="doc-economico" class="doc-tab-pane">
+                    <h2 style="color: var(--primary); margin-top: 0;">2.7 Análisis Económico de las Alternativas Actuales (Línea Base Financiera)</h2>
+                    <p>Se cuantifica el costo total real del suministro comercial actual (CNFL, tarifa industrial <strong>T-GI</strong>, supervisada por ARESEP), dividiendo los egresos en costos <strong>explícitos</strong> de facturación y costos <strong>implícitos</strong> u ocultos por vulnerabilidad sistémica.</p>
+
+                    <h3>Costos Explícitos (Facturación T-GI)</h3>
+                    <ul>
+                        <li><strong>Costo por Demanda Máxima:</strong> cargo fijo sobre la cresta más alta de potencia (promediada en bloques de 15 min). El pico de <strong>178.16 kW</strong> inducido por el compresor se factura mensualmente — el bajo FC (41.0 %) implica pagar permanentemente por capacidad usada solo en ventanas transitorias.</li>
+                        <li><strong>Costo por Consumo de Energía:</strong> con la jornada concentrada de 07:00 a 20:30, el <strong>80 % del consumo cae en bloque Punta</strong>, el estrato tarifario más costoso.</li>
+                    </ul>
+
+                    <h3>Penalización por Factor de Potencia</h3>
+                    <p>La norma AR-NT-SUCAL recarga a industrias con FP &lt; 0.90. La editorial opera a <strong>FP = 0.89</strong>, generando un recargo de <strong>1.123 %</strong> sobre la factura mensual de energía y demanda. Aunque marginal por ciclo, su acumulación anual justifica inversores con compensación dinámica de reactivos (kVAR).</p>
+
+                    <h3>Costos Implícitos por Indisponibilidad (el "núcleo de ingeniería")</h3>
+                    <p>Tomando U = 1.76 % (154.16 h de paro/año), el costo oculto se parametriza como:</p>
+                    <p style="background:var(--bg); border:1px solid var(--border); padding:12px 16px; border-radius:6px; font-family:monospace; color:var(--text); text-align:center;">C<sub>total_U</sub> = C<sub>mo</sub> + C<sub>mermas</sub> + C<sub>oportunidad</sub></p>
+                    <ul>
+                        <li><strong>C<sub>mo</sub>:</strong> mano de obra ociosa de operadores Xerox y Heidelberg durante las 154.16 h de detención.</li>
+                        <li><strong>C<sub>mermas</sub>:</strong> sustratos en máquina, tintas descalibradas y planchas ópticas CTP arruinadas al interrumpirse abruptamente el ciclo térmico (sags de 108.6 V).</li>
+                        <li><strong>C<sub>oportunidad</sub>:</strong> retrasos en distribución de material didáctico, subcontratación de talleres y horas extra para compensar las 376 fallas.</li>
+                    </ul>
+                    <p style="background-color: rgba(239, 68, 68, 0.1); border-left: 4px solid #ef4444; padding: 12px; border-radius: 4px; color: var(--text);"><strong>Conclusión — El Costo de la Inacción:</strong> mantener el esquema comercial actual ("No Invertir") es la opción <strong>más costosa</strong> a mediano y largo plazo. La suma de pérdidas por indisponibilidad + recargos por FP + sobredimensionamiento de demanda (178.16 kW) constituye el flujo de caja negativo de la línea base, pivote para la evaluación de rentabilidad (VAN, TIR, PRI) de la microred BESS/FV en el capítulo siguiente: el proyecto se autofinancia mitigando las ineficiencias actuales.</p>
+                </div>
+
                 <!-- Tab Marco -->
                 <div id="doc-marco" class="doc-tab-pane active">
                     <h2 style="color: var(--primary); margin-top: 0;">Marco Teórico</h2>
@@ -639,6 +774,9 @@
             } else {
                 document.body.classList.remove('colorblind');
             }
+            // Re-renderizar curva de demanda si su pestaña está visible
+            let cargaTab = document.getElementById('doc-carga');
+            if (cargaTab && cargaTab.classList.contains('active')) renderDemandChart();
             // Re-renderizar gráficos con la nueva paleta
             if (currentDailyData.length > 0) {
                 let startStr = document.getElementById('date-start').value;
@@ -655,6 +793,63 @@
             if (event && event.target) event.target.classList.add('active');
             let el = document.getElementById(tabId);
             if (el) el.classList.add('active');
+
+            // Render diferido de la curva de demanda (el canvas necesita estar visible)
+            if (tabId === 'doc-carga') {
+                setTimeout(renderDemandChart, 50);
+            }
+        }
+
+        let demandChartInst = null;
+        function renderDemandChart() {
+            const cv = document.getElementById('demandChart');
+            if (!cv) return;
+            if (demandChartInst) demandChartInst.destroy();
+
+            // Perfil de carga diario (TG) en intervalos horarios — analizador Fluke 1738 Clase S
+            const horas = ['00','01','02','03','04','05','06','07','08','09','10','11','12','13','14','15','16','17','18','19','20','21','22','23'];
+            const demanda = [13,12,12,12,13,14,35,92,120,135,178.16,110,88,105,130,115,108,95,90,75,55,20,13,12];
+            const setpoint = horas.map(() => 100);
+            const txtMuted = isColorblind ? '#cccccc' : '#cbd5e1';
+
+            demandChartInst = new Chart(cv.getContext('2d'), {
+                type: 'line',
+                data: {
+                    labels: horas,
+                    datasets: [
+                        {
+                            label: 'Demanda real TG (kW)',
+                            data: demanda,
+                            borderColor: isColorblind ? '#3b82f6' : '#f59e0b',
+                            backgroundColor: isColorblind ? 'rgba(59,130,246,0.15)' : 'rgba(245,158,11,0.15)',
+                            fill: true,
+                            tension: 0.35,
+                            pointRadius: 2
+                        },
+                        {
+                            label: 'Techo CNFL / Set-point Peak Shaving (100 kW)',
+                            data: setpoint,
+                            borderColor: '#ef4444',
+                            borderDash: [6, 4],
+                            pointRadius: 0,
+                            fill: false,
+                            tension: 0
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        title: { display: true, text: 'Curva de Demanda Diaria (TG) — Pico 178.16 kW · Demanda media 98.63 kW', color: isColorblind ? '#ffffff' : '#f8fafc' },
+                        legend: { labels: { color: txtMuted } }
+                    },
+                    scales: {
+                        y: { title: { display: true, text: 'Potencia activa (kW)', color: txtMuted }, ticks: { color: txtMuted }, grid: { color: '#334155' } },
+                        x: { title: { display: true, text: 'Hora del día', color: txtMuted }, ticks: { color: txtMuted }, grid: { color: 'transparent' } }
+                    }
+                }
+            });
         }
 
         function switchTab(modalPrefix, tab) {
