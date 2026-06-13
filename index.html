@@ -421,7 +421,8 @@
                         <li><strong>Rampa y meseta de operación (07:00–20:30):</strong> acoplamiento síncrono Zona A + B + C. Demanda promedio máxima estabilizada en <strong>98.63 kW</strong>.</li>
                         <li><strong>Crestas de disparo transitorio:</strong> picos erráticos hasta el <strong>178.16 kW</strong> absoluto (~10:00 h), no por mayor producción sino por superposición de corrientes de inserción (inrush) del compresor Atlas Copco de 18.5 kW.</li>
                     </ul>
-                    <p style="background-color: rgba(245, 158, 11, 0.1); border-left: 4px solid #f59e0b; padding: 12px; border-radius: 4px; color: var(--text);"><strong>Justificación del set-point (100 kW):</strong> dimensionar para los 178.16 kW haría inviable el costo de inversores y almacenamiento. Limitando la demanda vista por la CNFL a un techo plano de 100 kW se logra (1) reducir el cargo por demanda máxima facturada, (2) evitar caídas de tensión (≤108.6 V) por la impedancia del nodo durante arranques inductivos, y (3) que el inversor híbrido actúe como filtro dinámico aislando la Zona A.</p>
+                    <p style="background-color: rgba(245, 158, 11, 0.1); border-left: 4px solid #f59e0b; padding: 12px; border-radius: 4px; color: var(--text);"><strong>Justificación del set-point (100 kW):</strong> dimensionar para los 178.16 kW haría inviable el costo de inversores y almacenamiento. Limitando la demanda vista por la CNFL a un techo plano de 100 kW se logra (1) reducir el cargo por demanda máxima facturada, (2) evitar caídas de tensión (≤108.6 V) por la impedancia del nodo durante arranques inductivos, y (3) que el inversor híbrido actúe como filtro dinámico aislando la Zona A, en línea con la estrategia de <em>peak shaving</em> del almacenamiento electroquímico (Pota, 2022).</p>
+                    <p style="font-size:0.85rem; color:var(--text-muted);"><em>Fuente: «Modelación Física y Cuantificación Energética del Sistema de Manufactura» (Rodríguez Bolaños, 2026); registros del analizador Fluke 1738 Clase S.</em></p>
                 </div>
 
                 <!-- Tab Escenarios de Falla -->
@@ -430,7 +431,7 @@
                     <p>Se modelan matemáticamente los dos escenarios críticos que detienen el flujo productivo, demostrando el comportamiento físico de la infraestructura ante los disturbios documentados.</p>
 
                     <h3>Escenario A — Perturbación Dinámica Exógena (Sag de Voltaje)</h3>
-                    <p>El sag de la red CNFL se modela como un escalón donde la tensión cae bajo el umbral de inmunidad ITIC/CBEMA (V<sub>crit</sub> = 198 V para nominal de 208 V), alcanzando un mínimo de <strong>108.6 V</strong>. La energía en los capacitores de las fuentes conmutadas de la Xerox Iridesse se rige por el almacenamiento electrostático:</p>
+                    <p>El sag de la red CNFL se modela como un escalón donde la tensión cae bajo el umbral de inmunidad de la curva ITIC/CBEMA (V<sub>crit</sub> = 198 V para nominal de 208 V), alcanzando un mínimo de <strong>108.6 V</strong> (ITI, 2000). La energía en los capacitores de las fuentes conmutadas de la Xerox Iridesse se rige por el almacenamiento electrostático:</p>
                     <p style="background:var(--bg); border:1px solid var(--border); padding:12px 16px; border-radius:6px; font-family:monospace; color:var(--text); text-align:center;">E = ½ · C · V² &nbsp;→&nbsp; ΔE = 1 − (108.6 / 208)² = <strong style="color:#ef4444;">−72.7 %</strong></p>
                     <p>La energía disponible se deprime <strong>cuadráticamente un 72.7 %</strong>. Como la transferencia estática actual supera los 20 ms, se rebasa el <em>holdup time</em> de las fuentes, se interrumpe el lazo lógico y la prensa se apaga abruptamente. <strong>Mitigación:</strong> transferencia BESS On-Line ≤ 8 ms.</p>
 
@@ -438,6 +439,7 @@
                     <p>El arranque del motor de inducción del compresor de tornillo Atlas Copco (18.5 kW) introduce una corriente de inserción cresta de <strong>I<sub>inrush</sub> = 735.1 A</strong>. La caída de tensión transitoria en las barras del TG es función de la impedancia del nodo:</p>
                     <p style="background:var(--bg); border:1px solid var(--border); padding:12px 16px; border-radius:6px; font-family:monospace; color:var(--text); text-align:center;">ΔV<sub>trans</sub> = I<sub>inrush</sub> · Z<sub>nodo</sub></p>
                     <p>Esta deflexión instantánea deforma la onda senoidal e induce estrés térmico en las tarjetas de control contiguas. Este fenómeno físico es la causa raíz de los <strong>17 fallos catastróficos</strong> por calidad de energía registrados en el variador de frecuencia del propio compresor.</p>
+                    <p style="font-size:0.85rem; color:var(--text-muted);"><em>Fuente: «Modelación Física y Cuantificación Energética del Sistema de Manufactura» (Rodríguez Bolaños, 2026). Umbral de inmunidad según la curva ITIC/CBEMA (ITI, 2000); modos de falla del FTA (IEC 61025:2006) y AMEF (IEC 60812:2018).</em></p>
                 </div>
 
                 <!-- Tab Autonomía -->
@@ -447,6 +449,7 @@
                     <p>Para preservar la vida útil del banco de Litio-Ferrofosfato (LiFePO₄) ante el ciclado severo, se restringe la profundidad de descarga a <strong>DoD = 0.80</strong>. Con el tiempo crítico de restablecimiento y reinicio de sistemas lógicos t<sub>aut</sub> = 0.5 h (30 min):</p>
                     <p style="background:var(--bg); border:1px solid var(--border); padding:12px 16px; border-radius:6px; font-family:monospace; color:var(--text); text-align:center;">E<sub>BESS</sub> = (P · t<sub>aut</sub>) / DoD = (26.46 kW · 0.5 h) / 0.80 = <strong style="color:var(--primary);">16.54 kWh</strong></p>
                     <p>El modelado concluye que la microred requiere un banco con capacidad nominal mínima estricta de <strong>≈ 17 kWh</strong>. Este dimensionamiento optimiza la inversión de la universidad evitando sobredimensionar el sistema hacia cargas inductivas de la Zona C, que poseen su propia inercia mecánica.</p>
+                    <p style="font-size:0.85rem; color:var(--text-muted);"><em>Fuente: «Modelación Física y Cuantificación Energética del Sistema de Manufactura» (Rodríguez Bolaños, 2026); gestión del SoC y profundidad de descarga según Pota (2022).</em></p>
                 </div>
 
                 <!-- Tab Riesgo de Indisponibilidad -->
@@ -471,6 +474,7 @@
                     </table>
                     </div>
                     <p>En manufactura automatizada, una disponibilidad del 98.24 % implica <strong>154.16 horas de paro forzado anuales</strong> que interrumpen el flujo de valor institucional. El sistema propuesto se justifica no como respaldo pasivo, sino como <strong>acondicionador dinámico</strong> que eleva la disponibilidad hacia el umbral de "cuatro nueves" (99.99 %).</p>
+                    <p style="font-size:0.85rem; color:var(--text-muted);"><em>Fuente: «Modelación Física y Cuantificación Energética del Sistema de Manufactura» (Rodríguez Bolaños, 2026); indicadores de confiabilidad (λ, MTBF, MTTR) bajo distribución exponencial de tasa de fallas constante.</em></p>
                 </div>
 
                 <!-- Tab Análisis Económico -->
@@ -496,6 +500,7 @@
                         <li><strong>C<sub>oportunidad</sub>:</strong> retrasos en distribución de material didáctico, subcontratación de talleres y horas extra para compensar las 376 fallas.</li>
                     </ul>
                     <p style="background-color: rgba(239, 68, 68, 0.1); border-left: 4px solid #ef4444; padding: 12px; border-radius: 4px; color: var(--text);"><strong>Conclusión — El Costo de la Inacción:</strong> mantener el esquema comercial actual ("No Invertir") es la opción <strong>más costosa</strong> a mediano y largo plazo. La suma de pérdidas por indisponibilidad + recargos por FP + sobredimensionamiento de demanda (178.16 kW) constituye el flujo de caja negativo de la línea base, pivote para la evaluación de rentabilidad (VAN, TIR, PRI) de la microred BESS/FV en el capítulo siguiente: el proyecto se autofinancia mitigando las ineficiencias actuales.</p>
+                    <p style="font-size:0.85rem; color:var(--text-muted);"><em>Fuente: «Modelación Física y Cuantificación Energética del Sistema de Manufactura» (Rodríguez Bolaños, 2026); tarifa industrial T-GI de la CNFL y penalización por factor de potencia según la norma AR-NT-SUCAL (ARESEP, 2023).</em></p>
                 </div>
 
                 <!-- Tab Marco -->
@@ -579,10 +584,10 @@
                     <p>Se evidencia un desequilibrio sostenido (1.98%), un Factor de Potencia de 0.89 y una altísima Distorsión Armónica en Corriente (TDD de hasta 14.05%), advirtiendo de fuertes armónicos inyectados por las mismas cargas locales y condicionando la capacidad de filtrado del sistema propuesto.</p>
                     
                     <h3>Impacto en la Eficacia Global (OEE)</h3>
-                    <p>Se ha adaptado la ecuación de OEE ($A 	imes P 	imes Q$) para aislar la penalización directa de los sags. El <strong>Tiempo de Restablecimiento (Tr)</strong> tras una falla penaliza masivamente la Disponibilidad (A), generando el <strong>Costo de Inacción (COI)</strong> de la EUNED compuesto por dos variables cuantificables financieramente:</p>
+                    <p>Se ha adaptado la ecuación de OEE (<code>OEE = A × P × Q</code>) para aislar la penalización directa de los sags. El <strong>Tiempo de Restablecimiento (Tr)</strong> tras una falla penaliza masivamente la Disponibilidad (A), generando el <strong>Costo de Inacción (COI)</strong> de la EUNED compuesto por dos variables cuantificables financieramente:</p>
                     <ul>
-                        <li><strong>Costo de Tiempo Muerto ($C_{tm}$):</strong> Costo de la planilla ociosa durante la purga y reactivación del sistema.</li>
-                        <li><strong>Costo de Merma ($C_{merma}$):</strong> Maculatura y consumibles perdidos por paradas abruptas y recalibraciones.</li>
+                        <li><strong>Costo de Tiempo Muerto (C<sub>tm</sub>):</strong> Costo de la planilla ociosa durante la purga y reactivación del sistema.</li>
+                        <li><strong>Costo de Merma (C<sub>merma</sub>):</strong> Maculatura y consumibles perdidos por paradas abruptas y recalibraciones.</li>
                     </ul>
 
                     <h3 style="color: var(--primary); margin-top: 30px; border-top: 1px solid var(--border); padding-top: 20px;">Análisis Matemático de OEE y COI</h3>
@@ -697,18 +702,119 @@
                         <li><strong>Sistema 100% Aislado (Off-Grid) en Industria:</strong> Tratar de alimentar y mitigar los picos industriales absolutos (178 kW) desconectándose del todo de la red pública es técnica y espacialmente inviable con paneles solares, requiriendo un costo abismal en BESS. El diseño <strong>debe ser Grid-Tied Híbrido</strong>.</li>
                     </ul>
                 </div>
-                
-                
+
+                <!-- Tab Arquitectura Microred -->
+                <div id="doc-arquitectura" class="doc-tab-pane">
+                    <h2 style="color: var(--primary); margin-top: 0;">Arquitectura General de la Microred Híbrida</h2>
+                    <p>La solución no se limita a un respaldo pasivo: se configura como una <strong>microred híbrida conectada a la red (grid-tied)</strong> que integra, bajo un control unificado, la red pública de la CNFL, un sistema de almacenamiento en baterías (BESS), un arreglo fotovoltaico y un subconjunto de cargas críticas segregadas. Una microred es un sistema eléctrico delimitado que agrupa generación distribuida, almacenamiento y cargas, capaz de operar conectado a la red o en modo isla, incrementando sustantivamente la resiliencia y confiabilidad del suministro (Pota, 2022).</p>
+
+                    <h3>Componentes y flujo de energía</h3>
+                    <p>La arquitectura se organiza alrededor del <strong>Punto de Conexión Común (PCC)</strong> en baja tensión. Aguas abajo se ubican un inversor híbrido bidireccional, el banco BESS, el arreglo fotovoltaico sobre cubiertas, un tablero de cargas críticas Clase A físicamente segregado y el sistema de gestión de energía (EMS) que coordina el conjunto en función del estado de carga, el perfil de demanda y la condición instantánea de la red (Pota, 2022).</p>
+
+                    <h3>Inversores grid-forming vs. grid-following</h3>
+                    <p>Los inversores <strong>formadores de red (grid-forming)</strong> imponen tensión y frecuencia como fuente controlada; los <strong>seguidores de red (grid-following)</strong> se sincronizan con una referencia externa. La evidencia experimental reciente muestra que una configuración basada en almacenamiento con control grid-forming mejora marcadamente la resiliencia y la capacidad de <em>fault ride-through</em>, recuperando la tensión en cientos de milisegundos incluso ante caídas abruptas de irradiancia o incrementos súbitos de carga (Hossain et al., 2025).</p>
+
+                    <h3>Modos de operación</h3>
+                    <ul>
+                        <li><strong>Normal:</strong> la planta se alimenta de la red; la generación FV reduce la energía importada y ejecuta el recorte de picos (<em>peak shaving</em>).</li>
+                        <li><strong>Respaldo / isla:</strong> ante un sag &lt; 108.6 V o corte total, las cargas críticas se desconectan de la red y se sostienen con BESS y solar.</li>
+                        <li><strong>Recarga:</strong> las baterías se reponen con excedentes solares y ventanas de tarifa favorable.</li>
+                    </ul>
+                    <p style="font-size:0.85rem; color:var(--text-muted);"><em>Fuente: Capítulo V — Implementación del Modelo Contingencial (Rodríguez Bolaños, 2026).</em></p>
+                </div>
+
+                <!-- Tab BESS On-Line -->
+                <div id="doc-bess" class="doc-tab-pane">
+                    <h2 style="color: var(--primary); margin-top: 0;">Subsistema BESS y Topología On-Line de Doble Conversión</h2>
+                    <p>El almacenamiento electroquímico materializa la continuidad operativa. Más allá de la reserva de energía, el BESS provee servicios auxiliares determinantes: soporte de tensión, regulación de frecuencia, arranque autónomo (<em>black start</em>), recorte de picos, suavizado de potencia y respaldo durante fallas (Pota, 2022). Para la EUNED la prioridad jerárquica es el respaldo instantáneo de las cargas críticas y la absorción de los transitorios que originan las detenciones.</p>
+
+                    <h3>Topología On-Line y aislamiento galvánico</h3>
+                    <p>A diferencia de las topologías <em>standby</em> y <em>line-interactive</em> (que conmutan a baterías con varios milisegundos de transferencia), la topología de doble conversión en línea entrega energía acondicionada de forma permanente con <strong>transferencia cero</strong>, regulación de tensión estrecha y onda senoidal pura en todos los modos (Eaton, s.f.; Vertiv, 2019). La carga queda aislada de las irregularidades de la red el 100 % del tiempo, rompiendo el acoplamiento perjudicial entre cargas de fuerza y electrónica de control.</p>
+
+                    <h3>Criterio de transferencia ≤ 8 ms (curva ITIC/CBEMA)</h3>
+                    <p>El umbral de transferencia ≤ 8 ms se fundamenta en la curva de tolerancia del <strong>Information Technology Industry Council (ITIC)</strong>, antes publicada por la CBEMA, que describe la envolvente de tensión que el equipo de TI tolera sin interrumpir su función (ITI, 2000). Como las fuentes conmutadas sostienen la operación durante ~½ ciclo de la onda de 60 Hz, una transferencia &lt; 8 ms mantiene al sistema dentro de la región de no interrupción. La topología On-Line, con transferencia nula, cumple este requerimiento con amplio margen.</p>
+
+                    <h3>Dimensionamiento y preservación del banco</h3>
+                    <p>La potencia se fija por la frontera técnica (98.63 kW promedio, 178.16 kW pico, inrush de 735.1 A). La energía se determina por la autonomía requerida, la profundidad de descarga admisible del litio (DoD) y un margen de envejecimiento. El monitoreo continuo por módulo —tensión, corriente, temperatura y SoC— es indispensable para sostener la confiabilidad y operar como sistema resiliente (Pota, 2022; Hossain et al., 2025). Ver <strong>§Autonomía Energética</strong> para el cálculo E<sub>BESS</sub> = 16.54 kWh.</p>
+                    <p style="font-size:0.85rem; color:var(--text-muted);"><em>Fuente: Capítulo V (Rodríguez Bolaños, 2026).</em></p>
+                </div>
+
+                <!-- Tab Dimensionamiento Solar -->
+                <div id="doc-solar" class="doc-tab-pane">
+                    <h2 style="color: var(--primary); margin-top: 0;">Subsistema Fotovoltaico y Dimensionamiento Solar</h2>
+                    <p>El arreglo FV reduce la energía importada durante la jornada productiva y actúa como fuente primaria de recarga del BESS, disminuyendo la dependencia comercial y la huella de carbono. La variable física que gobierna su dimensionamiento es la <strong>irradiancia global horizontal (GHI)</strong>: la radiación solar total sobre una superficie horizontal, integrando componentes directa y difusa (Sandia National Laboratories, s.f.). La GHI del sitio (Mercedes de Montes de Oca) se registra y analiza en esta misma herramienta de modelado (Rodríguez Bolaños, s.f.).</p>
+
+                    <h3>Calidad de la fuente de datos</h3>
+                    <p>Las mediciones en tierra ofrecen mayor exactitud y representatividad espacial que las estimaciones satelitales, aunque estas son razonablemente válidas para ingeniería (AlFaraj et al., 2024). El dimensionamiento contrasta el histórico local del sitio con fuentes satelitales reconocidas para acotar la incertidumbre y evitar sobreestimaciones.</p>
+
+                    <h3>Razón de desempeño (PR) y cálculo del arreglo</h3>
+                    <p>La <strong>Razón de Desempeño (Performance Ratio, PR)</strong> relaciona la energía entregada con la energía teórica ideal, incorporando pérdidas por temperatura de celda, suciedad, sombreado, eficiencia del inversor, cableado y desajuste. En clima tropical el modelo penaliza la producción nominal con un coeficiente de temperatura realista (AlFaraj et al., 2024). Con GHI, PR y potencia pico se determina el número de paneles y la superficie de cubierta requerida, verificando compatibilidad con el área disponible. El arreglo se acopla al inversor híbrido por seguimiento MPPT.</p>
+
+                    <h3>Relación CC/CA y descarbonización</h3>
+                    <p>La relación entre potencia pico CC del arreglo y potencia nominal CA del inversor (CC/CA) se define para aprovechar la energía sin recorte excesivo; todo excedente recarga el BESS, elevando el factor de utilización. El subsistema alinea el proyecto con el <strong>Plan Nacional de Descarbonización 2018–2050</strong>, que fija emisiones netas cero al 2050 y prioriza renovables a costo competitivo (Gobierno de Costa Rica, 2019).</p>
+                    <p style="font-size:0.85rem; color:var(--text-muted);"><em>Fuente: Capítulo V (Rodríguez Bolaños, 2026).</em></p>
+                </div>
+
+                <!-- Tab EMS y Calidad -->
+                <div id="doc-ems" class="doc-tab-pane">
+                    <h2 style="color: var(--primary); margin-top: 0;">EMS, Calidad de Energía (IEEE 519) y Control Operativo</h2>
+                    <h3>Segregación de cargas críticas Clase A</h3>
+                    <p>El diagnóstico demostró que las barras comunes acoplan cargas inductivas (inrush de 735.1 A) con electrónica ultrasensible, elevando el IPR de la impresión digital a <strong>648 puntos</strong> (umbral tolerable: 200). La mitigación es un <strong>tablero de cargas críticas Clase A</strong> alimentado por el inversor On-Line, priorizando con criterio ABC la Xerox Igen 4, la línea Nuvera y el quemador Platerite 4300.</p>
+
+                    <h3>Control de armónicos conforme a IEEE 519</h3>
+                    <p>La calidad de onda se rige por el estándar <strong>IEEE Std 519-2022</strong>, que fija objetivos de distorsión de tensión y corriente en el PCC para cargas no lineales (IEEE, 2022). La planta presenta una <strong>TDD de hasta 14.05 %</strong>, que excede los límites recomendados. El inversor híbrido debe operar como <strong>filtro activo</strong>, sintetizando corrientes en contrafase que cancelen los armónicos; la corrección del factor de potencia (0.89) complementa esta función reduciendo la reactiva demandada.</p>
+
+                    <h3>Regulación de desbalance (AR-NT-SUCAL)</h3>
+                    <p>El criterio de aceptación en modo isla exige cumplir la norma nacional <strong>AR-NT-SUCAL</strong> de ARESEP: desbalance &lt; 3 %, THD_V &lt; 5 % y frecuencia estable en 60 Hz (ARESEP, 2023). El desbalance actual (1.98 %) está dentro del límite, pero el control debe sostenerlo en todos los modos. La inmunidad de la onda residual se evalúa contra la curva ITIC (ITI, 2000).</p>
+
+                    <h3>Funciones del EMS y coordinación de modos</h3>
+                    <p>El EMS incorpora el BESS a la operación, balancea el SoC, optimiza los flujos red-solar-cargas y reduce costos sujeto a mantener reserva de respaldo (Pota, 2022). Gestiona transiciones imperceptibles: en red opera como seguidor sincronizado con la CNFL; ante un sag conmuta a formador de red imponiendo tensión y frecuencia en isla (Hossain et al., 2025). Como el sistema es On-Line, la carga permanece alimentada durante la transición (Eaton, s.f.).</p>
+                    <p style="font-size:0.85rem; color:var(--text-muted);"><em>Fuente: Capítulo V (Rodríguez Bolaños, 2026).</em></p>
+                </div>
+
+                <!-- Tab Fases de Despliegue -->
+                <div id="doc-despliegue" class="doc-tab-pane">
+                    <h2 style="color: var(--primary); margin-top: 0;">Plan de Implementación y Fases de Despliegue</h2>
+                    <h3>Marco legal e institucional</h3>
+                    <p>La implementación se ampara en la <strong>Ley N.° 10086</strong> (Promoción y regulación de recursos energéticos distribuidos a partir de fuentes renovables), que habilita el autoconsumo con y sin entrega de excedentes y la generación en isla (Asamblea Legislativa de la República de Costa Rica, 2022). Su reglamentación (Decreto 43879 del MINAE) y los instrumentos tarifarios de ARESEP definen la metodología aplicable (ARESEP, 2023); la interconexión se tramita conforme a los formularios de la CNFL (CNFL, s.f.).</p>
+
+                    <h3>Restricciones de ejecución y mitigaciones</h3>
+                    <p>La principal limitación es administrativa: por ser sector público, la compra se rige por <strong>SICOP</strong>, con licitaciones prolongadas y vulnerabilidad ante recortes fiscales. Se mitiga con segregación estricta de cargas (acota la inversión) y arquitectura modular por fases. Una segunda limitación es el desgaste del inversor al operar como filtro activo continuo, gestionada con dimensionamiento térmico conservador y mantenimiento preventivo.</p>
+
+                    <h3>Criterios de aceptación y validación por simulación</h3>
+                    <p>Tres criterios obligatorios: (1) transferencia ≤ 8 ms ante sags &lt; 108.6 V o cortes, indexada a la curva ITIC; (2) segregación e inmunidad de las barras Clase A frente a arranques internos; (3) regulación de onda en isla con desbalance &lt; 3 %, THD_V &lt; 5 % y 60 Hz (ITI, 2000; ARESEP, 2023; IEEE, 2022). La verificación previa se efectúa por simulación energética horaria de los escenarios normal, respaldo y recarga, contrastando el inversor grid-forming con la literatura experimental (Hossain et al., 2025).</p>
+
+                    <h3>Fases secuenciales</h3>
+                    <ul>
+                        <li><strong>Fase 1:</strong> ingeniería de detalle, simulación de validación y tramitación de interconexión ante la CNFL.</li>
+                        <li><strong>Fase 2:</strong> tablero de cargas críticas + inversor con BESS — protección inmediata de la impresión digital (mayor IPR).</li>
+                        <li><strong>Fase 3:</strong> arreglo fotovoltaico y activación plena del recorte de picos.</li>
+                    </ul>
+                    <p>Cada fase incluye pruebas de aceptación en sitio (tiempo de transferencia, calidad de onda, operación en isla). El éxito se mide por la recuperación del OEE y la reducción del Costo de Inacción. La gestión del cambio contempla capacitación del personal y un registro de riesgos de contratación pública.</p>
+                    <p style="font-size:0.85rem; color:var(--text-muted);"><em>Fuente: Capítulo V (Rodríguez Bolaños, 2026).</em></p>
+                </div>
+
                 <!-- Tab Referencias -->
                 <div id="doc-referencias" class="doc-tab-pane">
                     <h2 style="color: var(--primary); margin-top: 0;">Referencias Bibliográficas</h2>
-                    <ul>
-                        <li>AlFaraj, J., et al. (2024). Solar irradiance database comparison for PV system design. <em>Sustainability</em>.</li>
-                        <li>Asamblea Legislativa de la República de Costa Rica. (2022). <em>Ley N.° 10086: Promoción y regulación de recursos energéticos distribuidos</em>.</li>
-                        <li>Autoridad Reguladora de los Servicios Públicos (ARESEP). (2023). <em>Metodología para generación distribuida</em>.</li>
-                        <li>Eaton. (s.f.). <em>Choosing the optimal UPS topology</em>.</li>
-                        <li>Hossain, M. I., et al. (2025). Enhancing microgrid resilience through integrated grid-forming inverter strategies. <em>Scientific Reports</em>.</li>
-                        <li>Institute of Electrical and Electronics Engineers. (2022). <em>IEEE Std 519-2022</em>.</li>
+                    <p style="font-size:0.85rem; color:var(--text-muted);">Citadas en formato APA (7.ª edición).</p>
+                    <ul style="line-height:1.7; font-size:0.92rem;">
+                        <li>AlFaraj, J., Popovici, E., &amp; Leahy, P. (2024). Solar irradiance database comparison for PV system design: A case study. <em>Sustainability, 16</em>(15), 6436. https://doi.org/10.3390/su16156436</li>
+                        <li>Asamblea Legislativa de la República de Costa Rica. (2022). <em>Ley N.° 10086: Promoción y regulación de recursos energéticos distribuidos a partir de fuentes renovables.</em> https://faolex.fao.org/docs/pdf/cos209441.pdf</li>
+                        <li>Autoridad Reguladora de los Servicios Públicos. (2023). <em>ARESEP aprobó metodología para generación distribuida.</em> https://aresep.go.cr/noticias/aresep-aprobo-metodologia-generacion-distribuida/</li>
+                        <li>Compañía Nacional de Fuerza y Luz. (s.f.). <em>Recursos energéticos distribuidos (DER).</em> Recuperado el 4 de junio de 2026, de https://www.cnfl.go.cr/servicios/electricos/recursos-energeticos-distribuidos</li>
+                        <li>Eaton. (s.f.). <em>Choosing the optimal UPS topology.</em> Recuperado el 4 de junio de 2026, de https://www.eaton.com/us/en-us/products/backup-power-ups-surge-it-power-distribution/backup-power-ups/choosing-the-optimal-ups-topology-.html</li>
+                        <li>Gobierno de Costa Rica. (2019). <em>Plan Nacional de Descarbonización 2018–2050.</em> Ministerio de Ambiente y Energía. https://cambioclimatico.go.cr/wp-content/uploads/2019/02/PLAN.pdf</li>
+                        <li>Hossain, M. I., Anonto, H. Z., Shufian, A., Pathik, B. B., Mannan, M. A., Rashid, A., &amp; Biswas, P. (2025). Enhancing microgrid resilience through integrated grid-forming and grid-following inverter strategies for solar PV battery control and fault ride-through. <em>Scientific Reports, 15</em>(1), 40078. https://doi.org/10.1038/s41598-025-18767-4</li>
+                        <li>Information Technology Industry Council. (2000). <em>ITI (CBEMA) curve application note.</em> https://www.itic.org</li>
+                        <li>Institute of Electrical and Electronics Engineers. (2022). <em>IEEE standard for harmonic control in electric power systems</em> (IEEE Std 519-2022). https://standards.ieee.org/ieee/519/10677/</li>
+                        <li>International Electrotechnical Commission. (2006). <em>Fault tree analysis (FTA)</em> (IEC 61025:2006). https://webstore.iec.ch/en/publication/4311</li>
+                        <li>International Electrotechnical Commission. (2018). <em>Failure modes and effects analysis (FMEA and FMECA)</em> (IEC 60812:2018). https://webstore.iec.ch/en/publication/26359</li>
+                        <li>Pota, H. R. (2022). A review of battery energy storage systems for ancillary services in distribution grids: Current status, challenges and future directions. <em>Frontiers in Energy Research, 10</em>, 971704. https://doi.org/10.3389/fenrg.2022.971704</li>
+                        <li>Rodríguez Bolaños, P. M. (s.f.). <em>Sunpower: Análisis histórico de producción solar</em> [Aplicación web]. Recuperado el 4 de junio de 2026, de https://agricien.github.io/sunpower/</li>
+                        <li>Rodríguez Bolaños, P. M. (2026). <em>Modelo contingencial energético sustentable para la Editorial EUNED</em> [Proyecto Final de Graduación]. Instituto Tecnológico de Costa Rica.</li>
+                        <li>Sandia National Laboratories. (s.f.). <em>Global horizontal irradiance.</em> PV Performance Modeling Collaborative. Recuperado el 4 de junio de 2026, de https://pvpmc.sandia.gov/modeling-guide/1-weather-design-inputs/irradiance-insolation/global-horizontal-irradiance/</li>
+                        <li>Vertiv. (2019). <em>What are the different types of UPS systems?</em> https://www.vertiv.com/en-us/about/news-and-insights/articles/educational-articles/what-are-the-different-types-of-ups-systems/</li>
                     </ul>
                 </div>
 
