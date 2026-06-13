@@ -365,6 +365,9 @@
                     <button class="doc-tab-btn" onclick="switchDocTab('doc-despliegue')">Fases de Despliegue</button>
                     <button class="doc-tab-btn" onclick="switchDocTab('doc-referencias')">Referencias</button>
                     <hr style="border-color: var(--border); width: 80%; margin: 10px auto;">
+                    <strong style="color: #f59e0b; font-size: 0.8rem; padding-left: 15px;">🗺️ Cierre del Proyecto</strong>
+                    <button class="doc-tab-btn" onclick="switchDocTab('doc-todo')">Hoja de Ruta y Pendientes (TODO)</button>
+                    <hr style="border-color: var(--border); width: 80%; margin: 10px auto;">
                     <button class="doc-tab-btn" onclick="switchDocTab('doc-about')">Acerca del Proyecto</button>
 </div>
             </div>
@@ -816,6 +819,57 @@
                         <li>Sandia National Laboratories. (s.f.). <em>Global horizontal irradiance.</em> PV Performance Modeling Collaborative. Recuperado el 4 de junio de 2026, de https://pvpmc.sandia.gov/modeling-guide/1-weather-design-inputs/irradiance-insolation/global-horizontal-irradiance/</li>
                         <li>Vertiv. (2019). <em>What are the different types of UPS systems?</em> https://www.vertiv.com/en-us/about/news-and-insights/articles/educational-articles/what-are-the-different-types-of-ups-systems/</li>
                     </ul>
+                </div>
+
+                <!-- Tab TODO / Hoja de Ruta -->
+                <div id="doc-todo" class="doc-tab-pane">
+                    <h2 style="color: var(--primary); margin-top: 0;">🗺️ Hoja de Ruta y Pendientes (TODO)</h2>
+                    <p>Estado de avance del Proyecto Final de Graduación y acciones requeridas para llevarlo a buen puerto. Las casillas <span style="color:#10b981;">✅</span> indican lo consolidado en el III Avance; las <span style="color:#f59e0b;">⬜</span> señalan lo pendiente, priorizado según su impacto en la defensa ante el tribunal.</p>
+
+                    <div style="background: rgba(16, 185, 129, 0.08); border-left: 4px solid #10b981; padding: 12px 15px; border-radius: 4px; color: var(--text); margin: 15px 0;">
+                        <strong style="color:#10b981;">✅ Consolidado (Cap IV + III Avance):</strong> diagnóstico de vulnerabilidad (PESTEL, VUCA, FODA, FTA, AMEF, ABC, OEE), modelación física del sistema (Factor de Carga, curva de demanda, escenarios de falla), dimensionamiento de autonomía (E_BESS = 16.54 kWh), cuantificación del riesgo (U = 1.76 %) y diseño conceptual de la microred (Cap V).
+                    </div>
+
+                    <h3 style="color:#ef4444;">1. Prioridad crítica — Realimentación del tutor</h3>
+                    <ul style="line-height:1.8;">
+                        <li>⬜ <strong>Monetizar el Costo de la Inacción (C<sub>total_U</sub>) en colones.</strong> El núcleo económico tiene la estructura (C<sub>mo</sub> + C<sub>mermas</sub> + C<sub>oportunidad</sub>) pero <em>faltan los montos ₡</em>. Calcular el costo de las 154.16 h de paro/año con datos reales de planilla, mermas y horas extra.</li>
+                        <li>⬜ <strong>Cuantificación económica por escenario de interrupción</strong> (sag exógeno vs. inrush endógeno), para visualizar el retorno esperado de las soluciones — punto explícito de la realimentación.</li>
+                    </ul>
+
+                    <h3 style="color:#f59e0b;">2. Levantamiento de datos de respaldo (gabinete y campo)</h3>
+                    <ul style="line-height:1.8;">
+                        <li>⬜ Impedancia del nodo (Z<sub>nodo</sub>) desde datos de placa del transformador principal, para cerrar el cálculo de ΔV<sub>trans</sub> del Escenario B.</li>
+                        <li>⬜ Histórico de <strong>facturas eléctricas (últimos 12 meses)</strong> de la Dirección Financiera de la UNED.</li>
+                        <li>⬜ Pliego tarifario oficial vigente <strong>T-GI de la CNFL</strong> (bloques Punta/Valle/Nocturno y cargo por demanda), aprobado por ARESEP.</li>
+                        <li>⬜ Costo horario de mano de obra del taller (RR. HH.) y registro de mermas (papel, tinta, planchas CTP) del jefe de taller.</li>
+                        <li>⬜ Cronometraje en piso del MTTR real tras un apagón (validar los 0.41 h / 25 min).</li>
+                        <li>⬜ Planos arquitectónicos de la Sede Central (Montes de Oca): área útil de techo para el arreglo FV.</li>
+                    </ul>
+
+                    <h3 style="color:#f59e0b;">3. Capítulo VI — Ingeniería económica del proyecto</h3>
+                    <ul style="line-height:1.8;">
+                        <li>⬜ Presupuesto de inversión (CAPEX) del BESS LiFePO₄, inversor híbrido, arreglo FV y tablero crítico.</li>
+                        <li>⬜ Flujo de caja: ahorros por peak shaving + recargo FP evitado + Costo de Inacción mitigado − OPEX.</li>
+                        <li>⬜ Métricas de rentabilidad: <strong>VAN, TIR y Período de Recuperación (PRI)</strong> — demostrar que el proyecto se autofinancia.</li>
+                        <li>⬜ Análisis de sensibilidad ante variación de tarifa, tasa de descuento y degradación del banco.</li>
+                    </ul>
+
+                    <h3 style="color:#f59e0b;">4. Validación, simulación y dimensionamiento definitivo</h3>
+                    <ul style="line-height:1.8;">
+                        <li>⬜ <strong>Simulación energética horaria</strong> de los escenarios normal / respaldo / recarga (validación previa a la implementación física), contrastando el inversor grid-forming con la literatura.</li>
+                        <li>⬜ Dimensionamiento <strong>concreto</strong> del arreglo solar: kWp, número de paneles, área y relación CC/CA, usando la GHI del sitio de esta herramienta.</li>
+                        <li>⬜ Definición de variables críticas, <strong>KPI y criterios de aceptación</strong> medibles (transferencia ≤ 8 ms, THD_V &lt; 5 %, desbalance &lt; 3 %).</li>
+                        <li>⬜ Verificación del MTBF (conciliar n = 376 eventos con MTBF = 22.96 h).</li>
+                    </ul>
+
+                    <h3 style="color:var(--text-muted);">5. Rigor académico y cierre documental</h3>
+                    <ul style="line-height:1.8;">
+                        <li>⬜ Reforzar el <strong>marco teórico</strong> con journals indexados recientes en resiliencia energética y confiabilidad operativa.</li>
+                        <li>⬜ Fortalecer la trazabilidad objetivos → herramientas → entregables (modelo sistémico unificado).</li>
+                        <li>⬜ Conclusiones y recomendaciones finales; revisión de formato APA y defensa.</li>
+                    </ul>
+
+                    <p style="background-color: rgba(245, 158, 11, 0.1); border-left: 4px solid #f59e0b; padding: 12px; border-radius: 4px; color: var(--text); margin-top:20px;"><strong>Ruta crítica:</strong> el ítem #1 (monetización económica) es el de mayor impacto, ya que conecta directamente con la oportunidad de fortalecimiento señalada y alimenta el Capítulo VI (#3). Los datos del bloque #2 son prerrequisito para ambos.</p>
                 </div>
 
                 <!-- Tab About -->
